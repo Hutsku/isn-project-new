@@ -45,7 +45,7 @@ while boucle:
 
 	objet.move() # On actualise la position des objets sur l'écran
 	objet.update() # on affiche les sprites à l'écran
-	objet.test_hitbox() # on test les hitbox des sprites entre eux
+	objet.hitbox() # on test les hitbox des sprites entre eux
 
 	pygame.display.flip() # raffraichissement de la fenêtre
 

@@ -17,7 +17,7 @@ def move():
 	for objet in Character.liste:
 		objet.move()
 
-def test_hitbox():
+def hitbox():
 	''' On check si les hitbox des sprites interragissent avec certains objets 
 		Hitbox d'attaque, projectile, pic au sol, etc. '''
 
