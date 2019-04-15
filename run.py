@@ -20,6 +20,19 @@ niveau = environnement.get_level()
 perso = objet.Personnage(niveau.spawn, (50, 50)) # on crée le personnage au spawn du niveau
 perso.image.fill((255, 0, 0))
 
+# ========================================== FONCTIONS ===========================================
+
+def objetEvent():
+	objet.move() # On actualise la position des objets sur l'écran (collision etc)
+	objet.hitbox() # on test les hitbox des sprites entre eux (dégat et trigger)
+	objet.update() # on affiche les sprites à l'écran
+
+def guiEvent():
+	pass
+
+def dongeonEvent():
+	pass
+
 # ===================================== BOUCLE PRINCIPALE ========================================
 
 boucle = True
@@ -43,9 +56,9 @@ while boucle:
 			if event.unicode == "s":
 				perso.bas()
 
-	objet.move() # On actualise la position des objets sur l'écran
-	objet.update() # on affiche les sprites à l'écran
-	objet.hitbox() # on test les hitbox des sprites entre eux
+	objetEvent() # Evenements relatifs aux objets
+	guiEvent() # Evenements relatifs à l'interface
+	dongeonEvent() # Evenements relatifs au niveau en général
 
 	pygame.display.flip() # raffraichissement de la fenêtre
 

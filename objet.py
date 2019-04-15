@@ -1,6 +1,8 @@
 import pygame
 from pygame.locals import *
 
+# ================================================== FONCTIONS GLOBALES ===============================================
+
 def update():
 	''' Affiche les sprites sur l'écran, selon l'ordre indiqué '''
 	for objet in Mur.liste:
@@ -56,7 +58,7 @@ def collide(rect, sprite_type="all"):
 	else:
 		return reponse
 		
-# ================================ CLASSE MERE ============================
+# ======================================================== CLASSE MERE ==================================================
 
 class Objet(pygame.sprite.Sprite):
 	liste = pygame.sprite.Group()
@@ -74,7 +76,7 @@ class Objet(pygame.sprite.Sprite):
 		''' Affiche le sprite sur l'écran '''
 		pygame.display.get_surface().blit(self.image, self.rect)
 
-# ================================ OBJET MOBILE ==========================
+# ======================================================= OBJET MOBILE ==================================================
 
 class Character(Objet):
 	liste = pygame.sprite.Group()
@@ -137,7 +139,7 @@ class Personnage(Character):
 		self.vy = -1
 
 
-# ================================ OBJET IMMOBILE ========================
+# ======================================================= OBJET IMMOBILE ================================================
 
 class Mur(Objet):
 	liste = pygame.sprite.Group()
