@@ -30,7 +30,6 @@ def hitbox():
 				if objet in liste_collide:
 					liste_collide.remove(objet) # on enlève l'objet lui même de la liste des sprite touchés ...
 				if liste_collide:
-					
 					objet.action(liste_collide) # on appel la fonction d'action de l'objet, avec les cibles en arguments
 
 def collide(rect, sprite_type="all"):
@@ -157,6 +156,7 @@ class Sol(Objet):
 		Sol.liste.add(self)
 
 class Escalier(Sol):
+
 	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
@@ -168,3 +168,9 @@ class Escalier(Sol):
 	def action(self, cible):
 		''' Met fin au niveau'''
 		print("FIN DU NIVEAU")
+
+		
+		
+		
+		
+		

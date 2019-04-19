@@ -17,11 +17,10 @@ environnement = dongeon.Dongeon() # on initialise le dongeon (1 seul possible)
 environnement.build() # on génère le 1er niveau 
 niveau = environnement.get_level()
 
-perso = objet.Personnage(niveau.spawn, (50, 50)) # on crée le personnage au spawn du niveau
+perso = objet.Personnage(niveau.spawn, (10, 10)) # on crée le personnage au spawn du niveau
 perso.image.fill((255, 0, 0))
 
 # ========================================== FONCTIONS ===========================================
-
 def objetEvent():
 	objet.move() # On actualise la position des objets sur l'écran (collision etc)
 	objet.hitbox() # on test les hitbox des sprites entre eux (dégat et trigger)
@@ -63,3 +62,4 @@ while boucle:
 	pygame.display.flip() # raffraichissement de la fenêtre
 
 # ================================================================================================
+# '''
