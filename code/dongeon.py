@@ -1,18 +1,22 @@
 import pygame
+import config
 from pygame.locals import *
+
 
 import objet
 
 class Dongeon ():
 	def __init__(self):
-		self.niveau = Niveau((100, 50), (400, 400)) # on crée un niveau par défaut
+		self.niveau = Niveau("../niveau/test.txt") # on crée un niveau par défaut
 
 	def build(self):
 		''' construit les murs et objets d'après les coordonnées du niveau'''
+		taille_case = config.getConfig()["taille_case"]
 		for mur in self.niveau.coord["mur"]:
-			objet.Mur(mur["position"], mur["dimension"])
+			print(mur*taille_case)
+			objet.Mur(mur*taille_case, (taille_case, taille_case))
 
-		objet.Escalier((self.niveau.fin), (70, 70))
+		objet.Escalier((self.niveau.fin), (taille_case, taille_case))
 
 	def get_level(self):
 		''' renvoit le niveau actuel '''
@@ -30,12 +34,26 @@ class Dongeon ():
 			self.niveau = niveau
 
 class Niveau ():
-	def __init__(self, spawn, fin):
-		self.spawn = spawn
-		self.fin = fin
+	def __init__(self, lien):
+		self.lien_lvl = lien
+		self.spawn = None
+		self.fin = None
 		self.coord = {"mur": [], "objet": []}
 		
 		self.build()
 		
 	def build (self):
-		self.coord["mur"].append({"dimension": (50, 200), "position": (100, 100), "type": 1}) # on ajoute un mur à une position et une dimension
+		with open(self.lien_lvl, "r") as fichier:
+			caseY=0
+			for line in fichier.readlines():
+				caseX=0
+				for lettre in line:
+					if lettre == "D":
+						self.spawn = (caseX, caseY)
+					if lettre == "F":
+						self.fin = (caseX, caseY)
+					if lettre == "x":
+						self.coord["mur"].append((caseX, caseY))
+					caseX +=1
+				caseY += 1
+		#self.coord["mur"].append({"dimension": (50, 200), "position": (100, 100), "type": 1}) # on ajoute un mur à une position et une dimension
