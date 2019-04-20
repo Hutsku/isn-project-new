@@ -1,6 +1,6 @@
 def getConfig():
 	taille_ecran = 500
-	nb_case = 17
+	nb_case = 20
 	taille_case = round(taille_ecran/nb_case)
 	taille_personnage = taille_case
 

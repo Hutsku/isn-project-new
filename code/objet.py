@@ -148,7 +148,6 @@ class Mur(Objet):
 
 		self.image.fill((0, 0, 0))
 
-
 class Sol(Objet):
 	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
@@ -158,19 +157,26 @@ class Sol(Objet):
 class Escalier(Sol):
 
 	liste = pygame.sprite.Group()
+	
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
 		Escalier.liste.add(self)
 
 		self.image.fill((0, 0, 255))
 		self.hitbox = self.rect.copy()
+		self.statut = False
 
 	def action(self, cible):
 		''' Met fin au niveau'''
 		print("FIN DU NIVEAU")
-
-		
-		
+		self.statut = True
+	
+	def fin(self):
+		statut = self.statut
+		print(self.statut)
+		if statut == True:
+			return(True)
+			self.statut = False
 		
 		
 		

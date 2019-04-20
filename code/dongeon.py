@@ -1,12 +1,14 @@
 import pygame
 from pygame.locals import *
+import os
+import random
 
 import objet
 import config
 
 class Dongeon ():
 	def __init__(self):
-		self.niveau = Niveau("../niveau/test.txt") # on crée un niveau par défaut
+		self.niveau = Niveau("../niveau") # on crée un niveau par défaut
 
 		self.taille_case = config.getConfig()["taille_case"]
 		self.taille_personnage = config.getConfig()["taille_personnage"]
@@ -49,14 +51,20 @@ class Dongeon ():
 
 class Niveau ():
 	def __init__(self, lien):
-		self.lien_lvl = lien
+		self.lien_lvl = None
+		self.lien_dossier = lien
 		self.spawn = None
 		self.fin = None
 		self.coord = {"mur": [], "objet": []}
+		self.nb_fichier = None
 		
 		self.build()
 		
 	def build (self):
+		self.comptage()
+		prochain_lvl = str(random.randint(1,self.nb_fichier))
+		self.lien_lvl = "../niveau/niveau"+prochain_lvl+".txt"
+		print(self.lien_lvl)
 		with open(self.lien_lvl, "r") as fichier: # on ouvre le fichier du lien
 			caseY=0 # initialisation de la case ligne Y  a 0
 			for line in fichier.readlines(): 
@@ -70,3 +78,8 @@ class Niveau ():
 						self.coord["mur"].append((caseX, caseY))
 					caseX +=1
 				caseY += 1
+	
+	def comptage(self): #permet de compter le nombre de fichier dans le dossier niveau
+		path, dirs, files = next(os.walk(self.lien_dossier))
+		self.nb_fichier = len(files)
+	
