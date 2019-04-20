@@ -3,22 +3,27 @@ from pygame.locals import *
 
 import objet
 import dongeon
+import config
 
 # ========================================= INITIALISATION =======================================
+taille_ecran = config.getConfig()["taille_ecran"]
+taille_personnage = config.getConfig()["taille_personnage"]
 
-pygame.init()
+
+pygame.init() #initialisation des modules py.game
 pygame.key.set_repeat(1) # Autorise la repetition d'event KEYDOWN si la touche est maintenue
-fenetre = pygame.display.set_mode((500, 500)) # creation de la fenetre (avec taille en parametre)
+fenetre = pygame.display.set_mode((taille_ecran, taille_ecran)) # creation de la fenetre (avec taille en parametre)
 
-fond = pygame.Surface((500, 500)) # Création du fond, de taille equivalente à la fenêtre
+fond = pygame.Surface((taille_ecran, taille_ecran)) # Création du fond, de taille equivalente à la fenêtre
 fond.fill((100, 100, 100)) # on colorie en gris
 
 environnement = dongeon.Dongeon() # on initialise le dongeon (1 seul possible)
 environnement.build() # on génère le 1er niveau 
-niveau = environnement.get_level()
+niveau = environnement.get_level() #on récupère le numéro de niveau
+spawn = environnement.depart()
 
-perso = objet.Personnage(niveau.spawn, (10, 10)) # on crée le personnage au spawn du niveau
-perso.image.fill((255, 0, 0))
+perso = objet.Personnage(spawn, (taille_personnage, taille_personnage)) # on crée le personnage au spawn du niveau
+perso.image.fill((255, 0, 0)) #attribution de la couleur personnage
 
 # ========================================== FONCTIONS ===========================================
 def objetEvent():
@@ -36,14 +41,14 @@ def dongeonEvent():
 
 boucle = True
 while boucle:
-	perso.vx = 0
-	perso.vy = 0
+	perso.vx = 0 #initialisation de la vitesse axe X personnage a 0
+	perso.vy = 0 #initialisation de la vitesse axe Y personnage a 0
 	fenetre.blit(fond, (0, 0)) # on colle le fond
 
-	# on gère les evenements claviers et souris
+	# on gère les evenements claviers et souris 
 	for event in pygame.event.get():
-		if event.type == QUIT:
-			boucle = False
+		if event.type == QUIT: #si clic sur croix rouge
+			boucle = False #fin de boucle
 
 		if event.type == KEYDOWN:
 			if event.unicode == "d":
