@@ -109,7 +109,7 @@ class Character(Objet):
 		if not liste_collide:
 			self.px += vx # on enregistre la position en float ...
 			self.py += vy
-			self.rect.center = (self.px, self.py) # ... convertit en int par le rect
+			self.rect.topleft = (self.px, self.py) # ... convertit en int par le rect
 
 	def action(self, cible):
 		''' Enclenche une action contre une cible '''

@@ -6,9 +6,9 @@ import dongeon
 import config
 
 # ========================================= INITIALISATION =======================================
+
 taille_ecran = config.getConfig()["taille_ecran"]
 taille_personnage = config.getConfig()["taille_personnage"]
-
 
 pygame.init() #initialisation des modules py.game
 pygame.key.set_repeat(1) # Autorise la repetition d'event KEYDOWN si la touche est maintenue
@@ -19,13 +19,13 @@ fond.fill((100, 100, 100)) # on colorie en gris
 
 environnement = dongeon.Dongeon() # on initialise le dongeon (1 seul possible)
 environnement.build() # on génère le 1er niveau 
-niveau = environnement.get_level() #on récupère le numéro de niveau
-spawn = environnement.depart()
+spawn = environnement.get_spawn()
 
 perso = objet.Personnage(spawn, (taille_personnage, taille_personnage)) # on crée le personnage au spawn du niveau
 perso.image.fill((255, 0, 0)) #attribution de la couleur personnage
 
 # ========================================== FONCTIONS ===========================================
+
 def objetEvent():
 	objet.move() # On actualise la position des objets sur l'écran (collision etc)
 	objet.hitbox() # on test les hitbox des sprites entre eux (dégat et trigger)
