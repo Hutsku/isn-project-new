@@ -18,13 +18,12 @@ fond = pygame.Surface((taille_ecran, taille_ecran)) # Création du fond, de tail
 fond.fill((100, 100, 100)) # on colorie en gris
 
 environnement = dongeon.Dongeon() # on initialise le dongeon (1 seul possible)
-environnement.build() # on génère le 1er niveau 
 spawn = environnement.get_spawn()
 
 perso = objet.Personnage(spawn, (taille_personnage, taille_personnage)) # on crée le personnage au spawn du niveau
 perso.image.fill((255, 0, 0)) #attribution de la couleur personnage
 
-objet.Escalier.fin()
+
 # ========================================== FONCTIONS ===========================================
 
 def objetEvent():
@@ -36,7 +35,7 @@ def guiEvent():
 	pass
 
 def dongeonEvent():
-	pass
+	dongeon.check_fin_niveau(environnement) # On regarde si un escalier a été activé (pour changer de niveau)
 
 # ===================================== BOUCLE PRINCIPALE ========================================
 
@@ -62,8 +61,8 @@ while boucle:
                         	perso.bas()
 
         objetEvent() # Evenements relatifs aux objets
-        guiEvent() # Evenements relatifs à l'interface
         dongeonEvent() # Evenements relatifs au niveau en général
+        guiEvent() # Evenements relatifs à l'interface
 
         pygame.display.flip() # raffraichissement de la fenêtre
 

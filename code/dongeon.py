@@ -6,29 +6,44 @@ import random
 import objet
 import config
 
+def check_fin_niveau(dongeon_actuel):
+	for escalier in objet.Escalier.liste:
+		if escalier.statut:
+			dongeon_actuel.change_level()
+
 class Dongeon ():
 	def __init__(self):
-		self.niveau = Niveau("../niveau") # on crée un niveau par défaut
-
-		self.taille_case = config.getConfig()["taille_case"]
-		self.taille_personnage = config.getConfig()["taille_personnage"]
-
-		self.spawn = self.niveau.spawn
+		self.lien_dossier = "../niveau/"
+		self.niveau = None # aucun niveau par défaut
+		self.change_level() # Choisi un niveau aléatoirement
 
 	def build(self):
 		'''construit les murs et objets d'après les coordonnées du niveau'''
+		taille_case = config.getConfig()["taille_case"]
+		spawn = (self.niveau.spawn[0]*taille_case, self.niveau.spawn[1]*taille_case)
+		fin = (self.niveau.fin[0]*taille_case, self.niveau.fin[1]*taille_case)
+		
 		for mur in self.niveau.coord["mur"]:
-			position = (mur[0]*self.taille_case, mur[1]*self.taille_case)
-			objet.Mur(position, (self.taille_case, self.taille_case))
+			position = (mur[0]*taille_case, mur[1]*taille_case)
+			objet.Mur(position, (taille_case, taille_case))
 
-		objet.Escalier((self.niveau.fin[0]*self.taille_case, self.niveau.fin[1]*self.taille_case), (self.taille_case, self.taille_case)) 
+		objet.Escalier(fin, (taille_case, taille_case))
+
+		for perso in objet.Personnage.liste: # On selectionne le personnage (il est censé n'y en avoir que 1)
+			perso.move(spawn) # et on le bouge au spawn
 	
+	def effacer(self):
+		''' Détruit tout les objets présent sur le niveau '''
+		objet.Mur.liste.empty() # On vide la liste de mur, empechant de les mettre à jour (c'est comme si ils n'existaient plus)
+		objet.Sol.liste.empty() # Idem pour les sols.
+		objet.Escalier.liste.empty() # Idem pour les sols.
+
 	# ============================== FONCTION GET =====================================
 
 	def get_spawn(self):
 		''' Renvoit la position du spawn du personnage '''
-		spawn = (self.spawn[0]*self.taille_case, self.spawn[1]*self.taille_case)
-		return spawn
+		taille_case = config.getConfig()["taille_case"]
+		return (self.niveau.spawn[0]*taille_case, self.niveau.spawn[1]*taille_case)
 
 	def get_level(self):
 		''' Renvoit le niveau actuel '''
@@ -36,35 +51,31 @@ class Dongeon ():
 
 	# ================================== PARAMETRE NIVEAU ============================
 
-	def change_level(self, niveau=None):
+	def change_level(self, lien_niveau=""):
 		''' Change le niveau du dongeon '''
 
-		if niveau: # Si un niveau ets passé en paramètre, on met celui-ci ...
-			if type(niveau) != type(self.niveau):
-				print("Vous devez passer un niveau valide en argument.")
-			else:
-				self.niveau = niveau
+		if lien_niveau: # Si un niveau ets passé en paramètre, on met celui-ci ...
+			self.niveau = Niveau(lien_niveau)
 
 		else: # ... sinon c'est automatique
-			print("changement de niveau...")
-		
+			(path, dirs, filenames) = next(os.walk(self.lien_dossier)) # liste tout les niveaux présent ...
+			fichier = random.choice(filenames)
+			self.niveau = Niveau(self.lien_dossier+fichier)	# ... puis on en choisit un et on créer le niveau.
+
+		self.effacer() # Puis on efface le précedant ...
+		self.build() # ... et on construit le nouveau.
+
 
 class Niveau ():
 	def __init__(self, lien):
-		self.lien_lvl = None
-		self.lien_dossier = lien
+		self.lien_lvl = lien
 		self.spawn = None
 		self.fin = None
 		self.coord = {"mur": [], "objet": []}
-		self.nb_fichier = None
 		
 		self.build()
 		
 	def build (self):
-		self.comptage()
-		prochain_lvl = str(random.randint(1,self.nb_fichier))
-		self.lien_lvl = "../niveau/niveau"+prochain_lvl+".txt"
-		print(self.lien_lvl)
 		with open(self.lien_lvl, "r") as fichier: # on ouvre le fichier du lien
 			caseY=0 # initialisation de la case ligne Y  a 0
 			for line in fichier.readlines(): 
@@ -79,7 +90,5 @@ class Niveau ():
 					caseX +=1
 				caseY += 1
 	
-	def comptage(self): #permet de compter le nombre de fichier dans le dossier niveau
-		path, dirs, files = next(os.walk(self.lien_dossier))
-		self.nb_fichier = len(files)
+
 	

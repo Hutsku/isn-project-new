@@ -6,3 +6,5 @@ def getConfig():
 
 	dic = {"taille_ecran":taille_ecran, "nb_case":nb_case, "taille_case":taille_case, "taille_personnage":taille_personnage}
 	return dic
+
+	
