@@ -36,7 +36,7 @@ class Dongeon ():
 		''' Détruit tout les objets présent sur le niveau '''
 		objet.Mur.liste.empty() # On vide la liste de mur, empechant de les mettre à jour (c'est comme si ils n'existaient plus)
 		objet.Sol.liste.empty() # Idem pour les sols.
-		objet.Escalier.liste.empty() # Idem pour les sols.
+		objet.Escalier.liste.empty() # Idem pour la fin.
 
 	# ============================== FONCTION GET =====================================
 
@@ -53,18 +53,22 @@ class Dongeon ():
 
 	def change_level(self, lien_niveau=""):
 		''' Change le niveau du dongeon '''
+		meme_niveau = True
+		while meme_niveau == True:
+			if lien_niveau: # Si un niveau est passé en paramètre, on met celui-ci ...
+				self.niveau = Niveau(lien_niveau)
 
-		if lien_niveau: # Si un niveau ets passé en paramètre, on met celui-ci ...
-			self.niveau = Niveau(lien_niveau)
-
-		else: # ... sinon c'est automatique
-			(path, dirs, filenames) = next(os.walk(self.lien_dossier)) # liste tout les niveaux présent ...
-			fichier = random.choice(filenames)
-			self.niveau = Niveau(self.lien_dossier+fichier)	# ... puis on en choisit un et on créer le niveau.
-
+			else: # ... sinon c'est automatique
+				(path, dirs, filenames) = next(os.walk(self.lien_dossier)) # liste tout les niveaux présent ...
+				fichier = random.choice(filenames)
+				self.niveau = Niveau(self.lien_dossier+fichier)	# ... puis on en choisit un et on créer le niveau.
+				niveau_actuel = self.get_level
+				if niveau_actuel == fichier:
+					meme_niveau = True
+				else:
+					meme_niveau = False
 		self.effacer() # Puis on efface le précedant ...
 		self.build() # ... et on construit le nouveau.
-
 
 class Niveau ():
 	def __init__(self, lien):
