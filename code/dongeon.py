@@ -15,7 +15,6 @@ def check_fin_niveau(dongeon_actuel):
 class Dongeon ():
 	def __init__(self):
 		self.lien_dossier = "../niveau/"
-		self.niveau_actuel = None
 		self.niveau = None # aucun niveau par défaut
 		self.change_level() # Choisi un niveau aléatoirement
 
@@ -56,23 +55,18 @@ class Dongeon ():
 
 	def change_level(self, lien_niveau=""):
 		''' Change le niveau du dongeon '''
-		meme_niveau = True
-		nom_futur = None
-		while meme_niveau == True:
-			if lien_niveau: # Si un niveau est passé en paramètre, on met celui-ci ...
-				self.niveau = Niveau(lien_niveau)
-			else: # ... sinon c'est automatique
-				(path, dirs, filenames) = next(os.walk(self.lien_dossier)) # liste tout les niveaux présent ...
-				fichier = random.choice(filenames)
-				nom_futur = self.lien_dossier+fichier
-				if nom_futur == self.niveau_actuel:
-					meme_niveau = True
-					print("meme lvl")
-				else:
-					meme_niveau = False
-					print("nouveau lvl")
-					self.niveau_actuel = nom_futur
-					self.niveau = Niveau(nom_futur)	# ... puis on en choisit un et on créer le niveau.		
+		if lien_niveau: # Si un niveau est passé en paramètre, on met celui-ci ...
+			self.niveau = Niveau(lien_niveau)
+
+		else: # ... sinon c'est automatique
+			(path, dirs, filenames) = next(os.walk(self.lien_dossier)) # liste tout les niveaux présent ...
+			
+			if self.niveau: # si il y a déjà un niveau avant ...
+				niveau_actuel = self.niveau.lien_lvl.split("/")[-1] # on recupère le nom du level et on l'arrange
+				filenames.remove(niveau_actuel) # on enlève de la liste le niveau actuel
+
+			fichier = random.choice(filenames)
+			self.niveau = Niveau(self.lien_dossier+fichier)	# ... puis on en choisit un et on créer le niveau.		
 				
 		self.effacer() # Puis on efface le précedant ...
 		self.build() # ... et on construit le nouveau.
