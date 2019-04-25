@@ -4,15 +4,17 @@ from pygame.locals import *
 import objet
 import dongeon
 import config
+import hud
 
 # ========================================= INITIALISATION =======================================
 
 taille_ecran = config.getConfig()["taille_ecran"]
+taille_HUD = config.getConfig()["taille_HUD"]
 taille_personnage = config.getConfig()["taille_personnage"]
 
 pygame.init() #initialisation des modules py.game
 pygame.key.set_repeat(1) # Autorise la repetition d'event KEYDOWN si la touche est maintenue
-fenetre = pygame.display.set_mode((taille_ecran, taille_ecran)) # creation de la fenetre (avec taille en parametre)
+fenetre = pygame.display.set_mode((taille_ecran+taille_HUD, taille_ecran)) # creation de la fenetre (avec taille en parametre)
 
 fond = pygame.Surface((taille_ecran, taille_ecran)) # Création du fond, de taille equivalente à la fenêtre
 fond.fill((100, 100, 100)) # on colorie en gris
@@ -20,9 +22,10 @@ fond.fill((100, 100, 100)) # on colorie en gris
 environnement = dongeon.Dongeon() # on initialise le dongeon (1 seul possible)
 spawn = environnement.get_spawn()
 
+hud.hudfix() #creation de l'hud (qui n'a pas besoin d'update)
+
 perso = objet.Personnage(spawn, (taille_personnage, taille_personnage)) # on crée le personnage au spawn du niveau
 perso.image.fill((255, 0, 0)) #attribution de la couleur personnage
-
 
 # ========================================== FONCTIONS ===========================================
 
@@ -33,18 +36,16 @@ def objetEvent():
 
 def guiEvent():
 	pass
-
+	
 def dongeonEvent():
 	dongeon.check_fin_niveau(environnement) # On regarde si un escalier a été activé (pour changer de niveau)
 
 # ===================================== BOUCLE PRINCIPALE ========================================
-
 boucle = True
 while boucle:
         perso.vx = 0 #initialisation de la vitesse axe X personnage a 0
         perso.vy = 0 #initialisation de la vitesse axe Y personnage a 0
         fenetre.blit(fond, (0, 0)) # on colle le fond
-
         # on gère les evenements claviers et souris 
         for event in pygame.event.get():
                 if event.type == QUIT: #si clic sur croix rouge
