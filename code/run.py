@@ -7,14 +7,14 @@ import config
 
 # ========================================= INITIALISATION =======================================
 
-taille_ecran = config.getConfig()["taille_ecran"]
+taille_niveau = config.getConfig()["taille_niveau"]
 taille_personnage = config.getConfig()["taille_personnage"]
 
 pygame.init() #initialisation des modules py.game
 pygame.key.set_repeat(1) # Autorise la repetition d'event KEYDOWN si la touche est maintenue
-fenetre = pygame.display.set_mode((taille_ecran, taille_ecran)) # creation de la fenetre (avec taille en parametre)
+fenetre = pygame.display.set_mode((taille_niveau, taille_niveau)) # creation de la fenetre (avec taille en parametre)
 
-fond = pygame.Surface((taille_ecran, taille_ecran)) # Création du fond, de taille equivalente à la fenêtre
+fond = pygame.Surface((taille_niveau, taille_niveau)) # Création du fond, de taille equivalente à la fenêtre
 fond.fill((100, 100, 100)) # on colorie en gris
 
 environnement = dongeon.Dongeon() # on initialise le dongeon (1 seul possible)
