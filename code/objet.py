@@ -92,8 +92,14 @@ class Character(Objet):
 		self.vx = 0
 		self.vy = 0
 
-	def move(self):
+	def move(self, coord=None):
 		''' Actualise la position de l'objet, selon ses vecteurs de vitesse '''
+		if coord:
+			self.rect.topleft = coord
+			(self.px, self.py) = coord
+			
+			return
+
 		vx = self.vx * self.speed
 		vy = self.vy * self.speed
 
@@ -137,7 +143,6 @@ class Personnage(Character):
 	def haut(self):
 		self.vy = -1
 
-
 # ======================================================= OBJET IMMOBILE ================================================
 
 class Mur(Objet):
@@ -148,7 +153,6 @@ class Mur(Objet):
 
 		self.image.fill((0, 0, 0))
 
-
 class Sol(Objet):
 	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
@@ -158,6 +162,7 @@ class Sol(Objet):
 class Escalier(Sol):
 
 	liste = pygame.sprite.Group()
+	
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
 		Escalier.liste.add(self)
@@ -165,12 +170,11 @@ class Escalier(Sol):
 		self.image.fill((0, 0, 255))
 		self.hitbox = self.rect.copy()
 
+		self.statut = False
+
 	def action(self, cible):
 		''' Met fin au niveau'''
-		print("FIN DU NIVEAU")
-
-		
-		
+		self.statut = True
 		
 		
 		
