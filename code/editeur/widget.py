@@ -34,7 +34,9 @@ class Widget(pygame.sprite.Sprite):
 		self.frame = frame
 
 	def _build(self):
-		pass
+		self.image = pygame.Surface(self.size).convert_alpha()
+		self.image.fill((255, 255, 255))
+		self.rect = self.image.get_rect()
 
 	def update(self):
 		# Met à jour l'affichage du Widget
@@ -60,30 +62,36 @@ class Widget(pygame.sprite.Sprite):
 
 
 class Label(Widget):
-	def __init__(self, position, size=(100, 30), foreground = [255, 255, 255], border = 0, border_color = [0, 0, 0], text = "", text_color = [0, 0, 0],
-	             centered = False, font = "arial", police = 14, adapt=True, frame=None):
+	def __init__(self, position, size=(100, 30), color = [255, 255, 255], border = 0, border_color = [0, 0, 0], text = "", text_color = [0, 0, 0],
+	             centered = False, font = "arial", police = 14, adapt=False, frame=None, bold=False, hoover_color=None):
 
 		super().__init__(position, size, frame)
 		self.text = text
 		self.font = font
 		self.police = police
 		self.adapt = adapt
+		self.bold = bold
 
 		self.border = border
 		self.border_color = border_color
-		self.foreground = foreground
+		self.color = color
 		self.text_color = text_color
 		self.centered = centered
 		self._indent = 10
+		self.hoover_color = hoover_color
+		self._hoover = False
 
 		self._build()
 
 	def _build(self):
 		# On remplit la couleur de fond
-		self.image.fill(self.foreground) 
+		if self._hoover:
+			self.image.fill(self.hoover_color) 
+		else:
+			self.image.fill(self.color)
 
 		# On initialise le texte
-		font = pygame.font.SysFont(self.font, self.police, bold=False, italic=False)
+		font = pygame.font.SysFont(self.font, self.police, bold=self.bold, italic=False)
 
 		if self.adapt:
 			self.rect.width = font.size(self.text)[0] + 2*self._indent
@@ -105,6 +113,17 @@ class Label(Widget):
 
 			# Une fois les paramètres appliqués, on colle le texte.
 			self.image.blit(obj_text, textpos)
+
+	def event(self, event):
+		if self.hoover_color:
+			rect = self.rect.copy()
+			if self.frame:
+				rect.x += self.frame.rect.x
+				rect.y += self.frame.rect.y
+			if rect.collidepoint(pygame.mouse.get_pos()):
+				self._hoover = True
+			else:
+				self._hoover = False
 
 
 class Image(Widget):
@@ -139,17 +158,18 @@ class Image(Widget):
 
 
 class Button(Label):
-	def __init__(self, position, size=(100, 30), border = 0, border_color = [0, 0, 0], foreground = [255, 255, 255], text = "", text_color = [0, 0, 0],
-	 			centered = False, font = "arial", police = 14, adapt=True, action = None, frame=None):
+	def __init__(self, position, size=(100, 30), border = 0, border_color = [0, 0, 0], color = [255, 255, 255], text = "", text_color = [0, 0, 0],
+	 			centered = False, font = "arial", police = 14, adapt=False, action = None, frame=None, bold=False, hoover_color=None):
 
-		super().__init__(position, size, foreground=foreground, border=border, border_color=border_color, text=text, text_color=text_color,
-					centered=centered, font=font, police=police, adapt=adapt, frame=frame)
+		super().__init__(position, size, color=color, border=border, border_color=border_color, text=text, text_color=text_color,
+					centered=centered, font=font, police=police, adapt=adapt, frame=frame, bold=bold, hoover_color=hoover_color)
 
 		self.action = action
 
 		self._build()
 
 	def event(self, event):
+		super().event(event) # on appelle la fonction event de Label
 		if event.type == MOUSEBUTTONUP:
 			rect = self.rect.copy()
 			if self.frame:

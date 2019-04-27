@@ -6,44 +6,56 @@ import hud
 import application
 import dongeon
 import objet
+import editeur.widget as widget
 
 #========================================== IMPORT CONFIIG ================================================
-pygame.init()
-fenetre = pygame.display.set_mode((surfaceW,surfaceH)) # création de la fenêtre
-fond = pygame.Surface((surfaceW,surfaceH))
-fond.fill((100, 100, 100))
-pygame.key.set_repeat(1) # Autorise la repetition d'event KEYDOWN si la touche est maintenue
 config = config.getConfig()
+taille = config["taille_ecran"]
+
+pygame.init()
+fenetre = pygame.display.set_mode(taille) # création de la fenêtre
+fond = pygame.Surface(taille)
+fond.fill((0, 0, 0))
+pygame.key.set_repeat(1) # Autorise la repetition d'event KEYDOWN si la touche est maintenue
 
 def objetEvent():
     objet.move() # On actualise la position des objets sur l'écran (collision etc)
     objet.hitbox() # on test les hitbox des sprites entre eux (dégat et trigger)
     objet.update() # on affiche les sprites à l'écran
 
-def guiEvent():
-    pass
+def hudEvent():
+    hud.hudfix()
 
-def dongeonEvent():
+def dongeonEvent(app):
+    environnement = application.get_dongeon(app)
     dongeon.check_fin_niveau(environnement) # On regarde si un escalier a été activé (pour changer de niveau)
 
 # ========================================= BOUCLE PRINCIPALE ===========================================
 
-application.start()
+app = application.Application()
+app.start()
 boucle = True
 while boucle:	
-    if application.check_statut_quitter():
+    if application.check_statut_quitter(app):
         boucle = False
 
-    if application.check_statut_menu():
+    elif application.check_statut_menu(app):
+        fond.fill((0, 0, 0))
+        fenetre.blit(fond, (0, 0)) # on colle le fond
         for event in pygame.event.get():
             widget.event(event) # Gestion des evenements sur les widget (pour les boutons par ex)
             if event.type == QUIT: #si clic sur croix rouge
                 boucle = False
 
         widget.update()
+        pygame.display.flip() # raffraichissement de la fenêtre
 
-    if application.check_statut_jeu():
-        perso = application.get_perso()
+    elif application.check_statut_transition(app):
+        pass
+
+    elif application.check_statut_jeu(app):
+        fond.fill((100, 100, 100))
+        perso = application.get_perso(app)
         perso.vx = 0 #initialisation de la vitesse axe X personnage a 0
         perso.vy = 0 #initialisation de la vitesse axe Y personnage a 0
         fenetre.blit(fond, (0, 0)) # on colle le fond
@@ -66,8 +78,8 @@ while boucle:
 
         widget.update()
         objetEvent() # Evenements relatifs aux objets
-        dongeonEvent() # Evenements relatifs au niveau en général
-        guiEvent() # Evenements relatifs à l'interface
+        dongeonEvent(app) # Evenements relatifs au niveau en général
+        hudEvent() # Evenements relatifs à l'interface
 
         pygame.display.flip() # raffraichissement de la fenêtre
 
