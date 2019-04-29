@@ -1,61 +1,7 @@
 import pygame
 from pygame.locals import *
 
-# ================================================== FONCTIONS GLOBALES ===============================================
 
-def update():
-	''' Affiche les sprites sur l'écran, selon l'ordre indiqué '''
-	for objet in Sol.liste:
-		objet.update()
-
-	for objet in Mur.liste:
-		objet.update()
-		
-	for objet in Character.liste:
-		objet.update()
-
-def move():
-	''' Actualise la position des objets '''		
-	for objet in Character.liste:
-		objet.move()
-
-def hitbox():
-	''' On check si les hitbox des sprites interragissent avec certains objets 
-		Hitbox d'attaque, projectile, pic au sol, etc. '''
-
-	for objet in Sol.liste:
-		if objet.hitbox: # si l'objet a une hitbox active ...
-			liste_collide = collide(objet.hitbox, sprite_type="character") # bug étrange avec "all"
-			if liste_collide:
-				if objet in liste_collide:
-					liste_collide.remove(objet) # on enlève l'objet lui même de la liste des sprite touchés ...
-				if liste_collide:
-					objet.action(liste_collide) # on appel la fonction d'action de l'objet, avec les cibles en arguments
-
-def collide(rect, sprite_type="all"):
-	''' Renvoit la liste des objets touchés par le rect '''
-	objet = pygame.sprite.Sprite()
-	objet.rect = rect
-
-	# on limite le nombre de sprite à tester selon le type donné
-	if sprite_type == "all":
-		group = Objet.liste	
-	elif sprite_type == "mur":
-		group = Mur.liste
-	elif sprite_type == "sol":
-		group = Sol.liste
-	elif sprite_type == "character":
-		group = Character.liste
-	else:
-		return None
-
-	''' il semble y avoir un bug étrange avec les groupes, conflit p-e ...'''
-
-	reponse = pygame.sprite.spritecollideany(objet, group)
-	if not type(reponse) == type([]) and reponse: # si un seul sprite est renvoyé, l'inclure dans une liste.
-		return [reponse]
-	else:
-		return reponse
 		
 # ======================================================== CLASSE MERE ==================================================
 
@@ -107,20 +53,22 @@ class Character(Objet):
 		fantome.x += vx
 		fantome.y += vy
 
-		liste_collide = collide(fantome, sprite_type="mur") # Check des collisions
-		if liste_collide:
-			if self in liste_collide:
-				liste_collide.remove(self) # on enlève l'objet lui même de la liste des sprite touché ...
+		liste_collision_mur = collide(fantome, Mur.liste) # Check des collisions avec les murs.
+		liste_collision_porte = collide(fantome, Porte.liste) # Check des collisions avec les portes.
 
-		if not liste_collide:
+		liste_collision_porte_ferme = []
+		for porte in liste_collision_porte:
+			if not porte.statut: # si la porte est fermée
+				liste_collision_porte_ferme.append(porte) # Si une porte est fermée, on comptabilise la collision
+
+		if (not liste_collision_mur) and (not liste_collision_porte_ferme):
 			self.px += vx # on enregistre la position en float ...
 			self.py += vy
 			self.rect.topleft = (self.px, self.py) # ... convertit en int par le rect
 
-	def action(self, cible):
-		''' Enclenche une action contre une cible '''
-		for objet in cible:
-			print(objet+" touché !")
+	def action(self, cible=None):
+		''' Interagit avec une cible '''
+		hitbox(groupe=Interrupteur.liste) # Interaction avec les interrupteurs
 
 
 class Personnage(Character):
@@ -143,7 +91,7 @@ class Personnage(Character):
 	def haut(self):
 		self.vy = -1
 
-# ======================================================= OBJET IMMOBILE ================================================
+# =============================================== OBJET IMMOBILE ========================================================
 
 class Mur(Objet):
 	liste = pygame.sprite.Group()
@@ -153,6 +101,7 @@ class Mur(Objet):
 
 		self.image.fill((0, 0, 0))
 
+
 class Sol(Objet):
 	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
@@ -161,6 +110,75 @@ class Sol(Objet):
 
 		self.image.fill((200, 200, 0))
 
+# ================================================ PORTE / INTERRUPTEUR ==================================================
+
+class Porte(Objet):
+	''' Porte pouvant tour à tour être ouverte ou fermée '''
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension):
+		super().__init__(position, dimension)
+		Porte.liste.add(self)
+
+		self.image.fill((0, 200, 0))
+		self.statut = False # False => ferme
+
+class Interrupteur(Objet):
+	''' Interrupteur permettant d'activer un mecanisme / porte '''
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension, cible=None):
+		super().__init__(position, dimension)
+		Interrupteur.liste.add(self)
+
+		self.image.fill((0, 200, 200))
+		self.cible = cible
+		self.statut = False
+
+		self.hitbox = self.rect.copy()	
+
+	def action(self, cible=None):
+		print(self.statut)
+		self.statut =  not self.statut
+
+		if type(self.cible) == type([]):
+			for cible in self.cible:
+				cible.action()
+		elif self.cible:
+			self.cible.action()
+
+
+class PorteInterrupteur(Porte):
+	''' Porte qui s'ouvre à l'aide d'un interrupteur '''
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension, interrupteur=None):
+		super().__init__(position, dimension)
+		PorteInterrupteur.liste.add(self)
+
+		self.image.fill((0, 200, 0))
+		self.interrupteur = interrupteur
+
+	def action(self, cible=None):
+		#print(self.statut)
+		''' Ouvre ou ferme la porte'''
+		if type(self.interrupteur) == type([]): # Si on a plusieurs interrupteurs ....
+			all_activated = True
+			for interrupteur in self.interrupteur:
+				if not interrupteur.statut:
+					all_activated = False
+
+			if all_activated: # on regarde si ils sont tous activés et on ouvre la porte
+				self.statut = True
+			else:
+				self.statut = False
+				
+		elif self.interrupteur:
+			if self.interrupteur: # si l'interrupteur est activé, on ouvre la porte
+				self.statut = True
+			else:
+				self.statut = False
+		
+
+# ===================================================== AUTRES ========================================================
+
 class SolSpawn(Sol):
 	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
@@ -168,6 +186,7 @@ class SolSpawn(Sol):
 		SolSpawn.liste.add(self)
 
 		self.image.fill((255, 0, 0))
+
 
 class Escalier(Sol):
 
@@ -186,5 +205,56 @@ class Escalier(Sol):
 		''' Met fin au niveau'''
 		self.statut = True
 		
+# ================================================== FONCTIONS GLOBALES ===============================================
+
+def update():
+	''' Affiche les sprites sur l'écran, selon l'ordre indiqué '''
+	for objet in Sol.liste:
+		objet.update()
+
+	for objet in Interrupteur.liste:
+		objet.update()
+
+	for objet in Mur.liste:
+		objet.update()
+
+	for objet in Porte.liste:
+		objet.update()
 		
-		
+	for objet in Character.liste:
+		objet.update()
+
+def move():
+	''' Actualise la position des objets '''		
+	for objet in Character.liste:
+		objet.move()
+
+def hitbox(groupe=None):
+	''' On check si les hitbox des sprites interragissent avec certains objets 
+		Hitbox d'attaque, projectile, pic au sol, etc. '''
+	if not groupe:
+		groupe = Sol.liste # par défaut on vérifie les hitbox au sol type pic etc.
+
+	for objet in groupe:
+		if objet.hitbox: # si l'objet a une hitbox active ...
+			liste_collide = collide(objet.hitbox, groupe=Character.liste) # bug étrange avec "all"
+			if liste_collide:
+				if objet in liste_collide:
+					liste_collide.remove(objet) # on enlève l'objet lui même de la liste des sprite touchés ...
+				if liste_collide:
+					objet.action(liste_collide) # on appel la fonction d'action de l'objet, avec les cibles en arguments
+
+def collide(rect, groupe=Objet.liste):
+	''' Renvoit la liste des objets touchés par le rect '''
+	objet = pygame.sprite.Sprite()
+	objet.rect = rect
+
+	''' il semble y avoir un bug étrange avec les groupes, conflit p-e ...'''
+
+	reponse = pygame.sprite.spritecollideany(objet, groupe)
+	if (not type(reponse) == type([])) and reponse: # si un seul sprite est renvoyé, l'inclure dans une liste.
+		return [reponse]
+	elif not reponse: # Si rien n'est donné, renvoyé une liste vide (qu'on puisse iterer sans erreurs)
+		return []
+	else:
+		return reponse

@@ -16,7 +16,12 @@ pygame.init()
 fenetre = pygame.display.set_mode(taille) # création de la fenêtre
 fond = pygame.Surface(taille)
 fond.fill((0, 0, 0))
-pygame.key.set_repeat(1) # Autorise la repetition d'event KEYDOWN si la touche est maintenue
+#pygame.key.set_repeat(1) # Autorise la repetition d'event KEYDOWN si la touche est maintenue
+
+porte = objet.PorteInterrupteur((200, 200), (config["taille_case"], config["taille_case"]))
+inter = objet.Interrupteur((270, 200), (config["taille_case"], config["taille_case"]), cible=porte)
+inter2 = objet.Interrupteur((310, 200), (config["taille_case"], config["taille_case"]), cible=porte)
+porte.interrupteur = [inter, inter2]
 
 def objetEvent():
     objet.move() # On actualise la position des objets sur l'écran (collision etc)
@@ -31,6 +36,8 @@ def dongeonEvent(app):
     dongeon.check_fin_niveau(environnement) # On regarde si un escalier a été activé (pour changer de niveau)
 
 # ========================================= BOUCLE PRINCIPALE ===========================================
+
+key_trad = {"a": 113, "z":119, "d":100, "q":97, "s":115} # traduction unicode et n° key
 
 app = application.Application()
 app.start()
@@ -56,8 +63,8 @@ while boucle:
     elif application.check_statut_jeu(app):
         fond.fill((100, 100, 100))
         perso = application.get_perso(app)
-        perso.vx = 0 #initialisation de la vitesse axe X personnage a 0
-        perso.vy = 0 #initialisation de la vitesse axe Y personnage a 0
+        #perso.vx = 0 #initialisation de la vitesse axe X personnage a 0
+        #perso.vy = 0 #initialisation de la vitesse axe Y personnage a 0
         fenetre.blit(fond, (0, 0)) # on colle le fond
 
         # on gère les evenements claviers et souris 
@@ -68,13 +75,22 @@ while boucle:
                     
             if event.type == KEYDOWN:
                 if event.unicode == "d":
-                        perso.droite()
+                    perso.droite()
                 if event.unicode == "q":
-                        perso.gauche()
+                    perso.gauche()
                 if event.unicode == "z":
-                        perso.haut()
+                    perso.haut()
                 if event.unicode == "s":
-                        perso.bas()
+                    perso.bas()
+                if event.unicode == "a":
+                    perso.action()
+
+            if event.type == KEYUP:
+                ''' L'event KEYUP ne donne pas de traduction unicode. J'utilise donc un dic fait maison '''
+                if key_trad["d"] == event.key or key_trad["q"] == event.key:
+                   perso.vx = 0
+                if key_trad["z"] == event.key or key_trad["s"] == event.key:
+                    perso.vy = 0
 
         widget.update()
         objetEvent() # Evenements relatifs aux objets

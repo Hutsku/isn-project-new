@@ -11,9 +11,9 @@ import config
 
 # ========================================= INITIALISATION =======================================
 
-taille_parametre = 300
-taille_level = config.getConfig()["taille_niveau"]
-taille_ecran = (taille_level+taille_parametre, taille_level)
+taille_level = config.getConfig()["taille_level"]
+taille_editeur = config.getConfig()["taille_editeur"]
+taille_ecran = (taille_editeur, taille_level)
 pygame.init() #initialisation des modules py.game
 fenetre = pygame.display.set_mode(taille_ecran) # creation de la fenetre (avec taille en parametre)
 
@@ -23,9 +23,9 @@ fond.fill((100, 100, 100)) # on colorie en gris
 # ================================================================================================
 
 class Editeur():
-	def __init__(self, taille_parametre, taille_level):
-		self.taille_parametre = taille_parametre
-		self.taille_level = taille_level
+	def __init__(self, width, height):
+		self.width = width
+		self.height = height
 		self.taille_case = config.getConfig()["taille_case"]
 		self.nb_case = config.getConfig()["nb_case"]
 
@@ -40,12 +40,12 @@ class Editeur():
 
 	def _init_editeur(self):
 		for x in range(self.nb_case):
-			pygame.draw.line(fond, (0, 0, 0), (x*self.taille_case+self.taille_case, 0), (x*self.taille_case+self.taille_case, self.taille_level))
-			pygame.draw.line(fond, (0, 0, 0), (0, x*self.taille_case+self.taille_case), (self.taille_level, x*self.taille_case+self.taille_case))
+			pygame.draw.line(fond, (0, 0, 0), (x*self.taille_case+self.taille_case, 0), (x*self.taille_case+self.taille_case, self.height))
+			pygame.draw.line(fond, (0, 0, 0), (0, x*self.taille_case+self.taille_case), (self.height, x*self.taille_case+self.taille_case))
 
-		frame1 = widget.Frame((510, 10), (280, 90), color=(100, 100,100), border=1)
-		frame2 = widget.Frame((510, 110), (280, 280), color=(100, 100,100), border=1)
-		frame3 = widget.Frame((510, 400), (280, 90), color=(100, 100,100), border=1)
+		frame1 = widget.Frame((self.height+10, 10), (280, 90), color=(100, 100,100), border=1)
+		frame2 = widget.Frame((self.height+10, 110), (280, 280), color=(100, 100,100), border=1)
+		frame3 = widget.Frame((self.height+10, 400), (280, 90), color=(100, 100,100), border=1)
 
 		self._entry = widget.Entry((10, 10), adapt=True, border=0, border_color=(255, 0, 0), text="niveau1", frame=frame1)
 		widget.Button((150, 50), text="Ouvrir", frame=frame1, action=self.load_level, hoover_color=(200, 200, 255), centered=True)
@@ -152,7 +152,7 @@ def objetEvent():
 
 # ===================================== BOUCLE PRINCIPALE ========================================
 
-editeur = Editeur(taille_parametre, taille_level)
+editeur = Editeur(taille_editeur, taille_level)
 
 boucle = True
 while boucle:
