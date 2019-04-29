@@ -127,14 +127,14 @@ class Label(Widget):
 
 
 class Image(Widget):
-	def __init__(self, position, size=(100, 100), foreground = [0, 0, 0, 0], border = 0, border_color = [0, 0, 0], path = "", 
+	def __init__(self, position, size=(100, 100), color = [0, 0, 0, 0], border = 0, border_color = [0, 0, 0], path = "", 
 				frame=None, image=None):
 
 		super().__init__(position, size, frame) # On met une dimension par défaut qui changera après de toute façon
 
 		self.border = border
 		self.border_color = border_color
-		self.foreground = foreground
+		self.color = color
 		self.size = size
 		self.path = path
 		self.image = image
@@ -181,10 +181,10 @@ class Button(Label):
 
 
 class ImageButton(Image):
-	def __init__(self, position, size=(100, 100), path = "", border = 0, border_color = [0, 0, 0], foreground = [255, 255, 255], 
+	def __init__(self, position, size=(100, 100), path = "", border = 0, border_color = [0, 0, 0], color = [255, 255, 255], 
 				action = None, frame=None, image=None):
 
-		super().__init__(position, size=size, foreground=foreground, border=border, border_color=border_color, path=path, 
+		super().__init__(position, size=size, color=color, border=border, border_color=border_color, path=path, 
 					frame=frame, image=image)
 
 		self.action = action
@@ -204,10 +204,10 @@ class ImageButton(Image):
 
 
 class Entry(Label):
-	def __init__(self, position, size=(100, 30), text = "", border = 0, border_color = [0, 0, 0], foreground = [255, 255, 255], text_color = [0, 0, 0], 
+	def __init__(self, position, size=(100, 30), text = "", border = 0, border_color = [0, 0, 0], color = [255, 255, 255], text_color = [0, 0, 0], 
     			font = "arial", police = 14, adapt=False, limit_character=None, frame=None):
 
-		super().__init__(position, size, foreground=foreground, border=border, border_color=border_color, text=text, text_color=text_color,
+		super().__init__(position, size, color=color, border=border, border_color=border_color, text=text, text_color=text_color,
 				centered=None, font=font, police=police, adapt=adapt, frame=frame)
 
 		self.unicode = True
@@ -226,7 +226,7 @@ class Entry(Label):
 
 	def _build(self):
 		# On remplit la couleur de fond
-		self.image.fill(self.foreground) 
+		self.image.fill(self.color) 
 
 		# On initialise le texte
 		font = pygame.font.SysFont(self.font, self.police, bold=False, italic=False)

@@ -29,7 +29,7 @@ class Editeur():
 		self.taille_case = config.getConfig()["taille_case"]
 		self.nb_case = config.getConfig()["nb_case"]
 
-		self.niveau = niveau = dongeon.NiveauTest("../niveau/niveau1.txt")
+		self.niveau = niveau = dongeon.Niveau("../niveau/niveau1.txt")
 		self.type_case = "mur"
 
 		self._entry = None
@@ -48,8 +48,8 @@ class Editeur():
 		frame3 = widget.Frame((510, 400), (280, 90), color=(100, 100,100), border=1)
 
 		self._entry = widget.Entry((10, 10), adapt=True, border=0, border_color=(255, 0, 0), text="niveau1", frame=frame1)
-		widget.Button((200, 10), text="Ouvrir", frame=frame1, action=self.load_level)
-		widget.Button((10, 50), text="Enregistrer", frame=frame1, action=self.save_level)
+		widget.Button((150, 50), text="Ouvrir", frame=frame1, action=self.load_level, hoover_color=(200, 200, 255), centered=True)
+		widget.Button((10, 50), text="Enregistrer", frame=frame1, action=self.save_level, hoover_color=(200, 200, 255), centered=True)
 
 		widget.ImageButton((10, 10), size=(30, 30), action=self.type_mur, path="../image/mur.png", frame=frame3)
 		widget.ImageButton((10, 50), size=(30, 30), action=self.type_sol, path="../image/sol.png", frame=frame3)
