@@ -2,10 +2,6 @@ import pygame
 from pygame.locals import *
 import os
 import random
-import pygame
-from pygame.locals import *
-import os
-import random
 import json
 
 import objet
@@ -40,7 +36,8 @@ class Dongeon ():
 					objet.Sol(position, (taille_case, taille_case))
 				if type_case == "fin":
 					objet.Escalier(position, (taille_case, taille_case))
-					self.niveau.fin = (x, y)
+				if type_case == "spawn":
+					objet.Sol(position, (taille_case, taille_case))
 				y += 1
 			x += 1
 

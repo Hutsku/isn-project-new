@@ -5,10 +5,10 @@ from pygame.locals import *
 
 def update():
 	''' Affiche les sprites sur l'écran, selon l'ordre indiqué '''
-	for objet in Mur.liste:
+	for objet in Sol.liste:
 		objet.update()
 
-	for objet in Sol.liste:
+	for objet in Mur.liste:
 		objet.update()
 		
 	for objet in Character.liste:
@@ -160,6 +160,14 @@ class Sol(Objet):
 		Sol.liste.add(self)
 
 		self.image.fill((200, 200, 0))
+
+class SolSpawn(Sol):
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension):
+		super().__init__(position, dimension)
+		SolSpawn.liste.add(self)
+
+		self.image.fill((255, 0, 0))
 
 class Escalier(Sol):
 
