@@ -2,6 +2,11 @@ import pygame
 from pygame.locals import *
 import os
 import random
+import pygame
+from pygame.locals import *
+import os
+import random
+import json
 
 import objet
 import config
@@ -18,18 +23,26 @@ class Dongeon ():
 		self.niveau = None # aucun niveau par défaut
 		self.change_level() # Choisi un niveau aléatoirement
 
-		
 	def build(self):
 		'''construit les murs et objets d'après les coordonnées du niveau'''
 		taille_case = config.getConfig()["taille_case"]
 		spawn = (self.niveau.spawn[0]*taille_case, self.niveau.spawn[1]*taille_case)
-		fin = (self.niveau.fin[0]*taille_case, self.niveau.fin[1]*taille_case)
-		
-		for mur in self.niveau.coord["mur"]:
-			position = (mur[0]*taille_case, mur[1]*taille_case)
-			objet.Mur(position, (taille_case, taille_case))
 
-		objet.Escalier(fin, (taille_case, taille_case))
+		x=0
+		for a in self.niveau.coord["terrain"]:
+			y=0
+			for case in self.niveau.coord["terrain"][x]:
+				position = (x*taille_case, y*taille_case)
+				type_case = case["type"]
+				if type_case == "mur":
+					objet.Mur(position, (taille_case, taille_case))
+				if type_case == "sol":
+					objet.Sol(position, (taille_case, taille_case))
+				if type_case == "fin":
+					objet.Escalier(position, (taille_case, taille_case))
+					self.niveau.fin = (x, y)
+				y += 1
+			x += 1
 
 		for perso in objet.Personnage.liste: # On selectionne le personnage (il est censé n'y en avoir que 1)
 			perso.move(spawn) # et on le bouge au spawn
@@ -75,25 +88,18 @@ class Niveau ():
 	def __init__(self, lien):
 		self.lien_lvl = lien
 		self.spawn = None
-		self.fin = None
-		self.coord = {"mur": [], "objet": []}
+		self.coord = {"terrain": [], "objets": []}
 		
 		self.build()
 		
 	def build (self):
 		with open(self.lien_lvl, "r") as fichier: # on ouvre le fichier du lien
-			caseY=0 # initialisation de la case ligne Y  a 0
-			for line in fichier.readlines(): 
-				caseX=0 # initialisation de la case ligne X a 0
-				for lettre in line:
-					if lettre == "D": # (départ)
-						self.spawn = (caseX, caseY)
-					if lettre == "F": # (fin)
-						self.fin = (caseX, caseY)
-					if lettre == "x": # (mur)
-						self.coord["mur"].append((caseX, caseY))
-					caseX +=1
-				caseY += 1
+			json_dic = fichier.read()
+			dic = json.loads(json_dic)
+
+			self.spawn = dic["spawn"]
+			self.coord["terrain"] = dic["terrain"]
+			self.coord["objets"] = dic["objets"]
 	
 
 	

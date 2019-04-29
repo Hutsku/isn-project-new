@@ -79,7 +79,7 @@ while boucle:
         widget.update()
         objetEvent() # Evenements relatifs aux objets
         dongeonEvent(app) # Evenements relatifs au niveau en général
-        hudEvent() # Evenements relatifs à l'interface
+        #hudEvent() # Evenements relatifs à l'interface
 
         pygame.display.flip() # raffraichissement de la fenêtre
 
