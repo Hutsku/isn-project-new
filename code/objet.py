@@ -161,6 +161,14 @@ class Sol(Objet):
 
 		self.image.fill((200, 200, 0))
 
+class SolSpawn(Sol):
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension):
+		super().__init__(position, dimension)
+		SolSpawn.liste.add(self)
+
+		self.image.fill((255, 0, 0))
+
 class Escalier(Sol):
 
 	liste = pygame.sprite.Group()

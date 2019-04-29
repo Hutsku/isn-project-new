@@ -72,7 +72,8 @@ class Editeur():
 					objet.Sol(position, (self.taille_case, self.taille_case))
 				if type_case == "fin":
 					objet.Escalier(position, (self.taille_case, self.taille_case))
-					self.niveau.fin = (x, y)
+				if type_case == "spawn":
+					objet.SolSpawn(position, (self.taille_case, self.taille_case))
 				y += 1
 			x += 1
 
@@ -92,10 +93,11 @@ class Editeur():
 		if self.type_case == "sol":
 			objet.Sol(position, (self.taille_case, self.taille_case))
 		if self.type_case == "spawn":
-			self.niveau.spawn = (x, y)
+			self.niveau.spawn = (pos_x, pos_y)
+			objet.SolSpawn(position, (self.taille_case, self.taille_case)) # une simple case Sol rouge
 		if self.type_case == "fin":
 			objet.Escalier(position, (self.taille_case, self.taille_case))
-			self.niveau.fin = (x, y)
+
 		self.niveau.coord["terrain"][pos_x][pos_y]["type"] = self.type_case
 
 	def supp_case(self, x, y):
