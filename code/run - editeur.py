@@ -172,12 +172,16 @@ class Editeur():
 		if type_case == "porte":
 			nb_cible = len(self.niveau.coord["terrain"][pos_x][pos_y]["cible"])
 			self.widg_label_param.text = "- Porte reliée à ({}) mécanisme(s).".format(nb_cible)
+			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
+			self.case_selection_cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
 		elif type_case == "interrupteur":
 			nb_cible = len(self.niveau.coord["terrain"][pos_x][pos_y]["cible"])
 			self.widg_label_param.text = "- Interrupteur reliée à ({}) mécanisme(s).".format(nb_cible)
 			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
+			self.case_selection_cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
 		else:
 			self.widg_label_param.text = "Aucun(s) paramètre(s)"
+			self.case_selection_cible = []
 
 	def add_case_cible(self, x, y):
 		pos_x = math.floor(x/self.taille_case)
@@ -199,7 +203,8 @@ class Editeur():
 
 			''' on supprime ensuite le lien dans l'autre sens de la cible vers mecanisme '''
 			if case_cible["type"] == "interrupteur" or case_cible["type"] == "porte":
-				case_cible["cible"].remove(self.case_selection)
+				if self.case_selection in case_cible["cible"]:
+					case_cible["cible"].remove(self.case_selection)
 
 	def valider_cible(self):
 		(x, y) = self.case_selection
@@ -320,10 +325,16 @@ while boucle:
 		position = (pos_x*editeur.taille_case, pos_y*editeur.taille_case)
 		fenetre.blit(editeur._selection_rect, position)
 	if editeur.case_selection_cible:
+		taille_case = editeur.taille_case
 		for case in editeur.case_selection_cible:
 			(pos_x, pos_y) = case
 			position = (pos_x*editeur.taille_case, pos_y*editeur.taille_case)
 			fenetre.blit(editeur._selection_cible_rect, position)
+
+			case_selection = editeur.case_selection
+			position_debut = ((pos_x*taille_case)+taille_case/2, (pos_y*taille_case)+taille_case/2)
+			position_fin = ((case_selection[0]*taille_case)+taille_case/2, (case_selection[1]*taille_case)+taille_case/2)
+			pygame.draw.line(fenetre, (0, 0, 255), position_debut, position_fin)
 
 	pygame.display.flip() # raffraichissement de la fenêtre
 
