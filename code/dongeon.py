@@ -22,6 +22,7 @@ class Dongeon ():
 	def build(self):
 		'''construit les murs et objets d'après les coordonnées du niveau'''
 		taille_case = config.getConfig()["taille_case"]
+		taille_personnage = config.getConfig()["taille_personnage"]
 		spawn = (self.niveau.spawn[0]*taille_case, self.niveau.spawn[1]*taille_case)
 
 		x=0
@@ -38,17 +39,42 @@ class Dongeon ():
 					objet.Escalier(position, (taille_case, taille_case))
 				if type_case == "spawn":
 					objet.Sol(position, (taille_case, taille_case))
+				if type_case == "porte":
+					objet.PorteInterrupteur(position, (taille_case, taille_case), interrupteur=case["cible"])
+				if type_case == "interrupteur":
+					objet.Interrupteur(position, (taille_case, taille_case), cible=case["cible"])
 				y += 1
 			x += 1
 
-		for perso in objet.Personnage.liste: # On selectionne le personnage (il est censé n'y en avoir que 1)
-			perso.move(spawn) # et on le bouge au spawn
+		''' On va rechercher et ajouter les cible à leur mecanisme (l'objet lui-même, pas les coordonnées) '''
+		for porte in objet.PorteInterrupteur.liste:
+			list_cible = []
+			print(porte.interrupteur)
+			for (cible_x, cible_y) in porte.interrupteur:
+				position_cible = (cible_x*taille_case, cible_y*taille_case)
+				for interrupteur in objet.Interrupteur.liste:
+					if interrupteur.rect.topleft == position_cible:
+						list_cible.append(interrupteur)
+			porte.interrupteur = list_cible
+
+		for interrupteur in objet.Interrupteur.liste:
+			list_cible = []
+			for (cible_x, cible_y) in interrupteur.cible:
+				position_cible = (cible_x*taille_case, cible_y*taille_case)
+				for porte in objet.PorteInterrupteur.liste:
+					if porte.rect.topleft == position_cible:
+						list_cible.append(porte)
+			interrupteur.cible = list_cible
+
+		''' On spawn le perso au bon endroit '''
+		for perso in objet.Personnage.liste:
+			perso.move(coord=spawn)
 	
 	def effacer(self):
-		''' Détruit tout les objets présent sur le niveau '''
-		objet.Mur.liste.empty() # On vide la liste de mur, empechant de les mettre à jour (c'est comme si ils n'existaient plus)
-		objet.Sol.liste.empty() # Idem pour les sols.
-		objet.Escalier.liste.empty() # Idem pour la fin.
+		''' Détruit tout les objets présent sur le niveau (sauf le perso) '''
+		for sprite in objet.Objet.liste:
+			if not objet.Personnage.liste.has(sprite): # si le sprite n'est pas le perso, on le détruit
+				sprite.kill()
 
 	# ============================== FONCTION GET =====================================
 

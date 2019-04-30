@@ -69,9 +69,7 @@ class Jeu:
 
         self.environnement = dongeon.Dongeon() # on initialise le dongeon (1 seul possible)
         self.spawn = self.environnement.get_spawn()
-
-        self.perso = objet.Personnage(self.spawn, (taille_personnage, taille_personnage)) # on crée le personnage au spawn du niveau
-        self.perso.image.fill((255, 0, 0)) # attribution de la couleur personnage
+        self.perso = objet.Personnage(self.spawn, (taille_personnage, taille_personnage))
 
     def detruire(self):
         ''' Efface tout les sprite de la fenêtre '''

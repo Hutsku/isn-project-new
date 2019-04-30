@@ -31,30 +31,63 @@ class Editeur():
 
 		self.niveau = niveau = dongeon.Niveau("../niveau/niveau1.txt")
 		self.type_case = "mur"
+		self.type_mode = "selection"
+		self.case_selection = None
+		self.case_selection_cible = []
 
-		self._entry = None
+		''' on crée un carré qui servira à montrer la selection d'une case. '''
+		self._selection_rect = pygame.Surface((self.taille_case, self.taille_case)).convert_alpha()
+		self._selection_rect.fill((0, 0, 0, 0))
+		self._selection_cible_rect = self._selection_rect.copy()
+		pygame.draw.rect(self._selection_rect, (255, 0, 0), Rect((0, 0), (self.taille_case, self.taille_case)), 1)
+		pygame.draw.rect(self._selection_cible_rect, (0, 0, 255), Rect((0, 0), (self.taille_case, self.taille_case)), 1)
+
+		''' variables contenant les widget à mettre à jour '''
+		self.widg_entry = None 
+		self.widg_select_mode = None
+		self.widg_label_param = None 
+		self.widg_button_cible = None
+		self.frame1 = None
+		self.frame2 = None
+		self.frame3 = None
 
 		self._init_editeur()
 
-	# ========================= PARAMETRES EDITEUR =============================
+	# ================================== EDITION NIVEAU =============================
 
 	def _init_editeur(self):
 		for x in range(self.nb_case):
 			pygame.draw.line(fond, (0, 0, 0), (x*self.taille_case+self.taille_case, 0), (x*self.taille_case+self.taille_case, self.height))
 			pygame.draw.line(fond, (0, 0, 0), (0, x*self.taille_case+self.taille_case), (self.height, x*self.taille_case+self.taille_case))
 
+		''' Définition des Frames (cadres) de l'editeur '''
 		frame1 = widget.Frame((self.height+10, 10), (280, 90), color=(100, 100,100), border=1)
 		frame2 = widget.Frame((self.height+10, 110), (280, 280), color=(100, 100,100), border=1)
 		frame3 = widget.Frame((self.height+10, 400), (280, 90), color=(100, 100,100), border=1)
+		self.frame1 = frame1
+		self.frame2 = frame2
+		self.frame3 = frame3
 
-		self._entry = widget.Entry((10, 10), adapt=True, border=0, border_color=(255, 0, 0), text="niveau1", frame=frame1)
+		''' FRAME 1 - Sauvegarde / Ouverture d'un niveau '''
+		self.widg_entry = widget.Entry((10, 10), adapt=True, border=0, border_color=(255, 0, 0), text="niveau1", frame=frame1)
 		widget.Button((150, 50), text="Ouvrir", frame=frame1, action=self.load_level, hoover_color=(200, 200, 255), centered=True)
 		widget.Button((10, 50), text="Enregistrer", frame=frame1, action=self.save_level, hoover_color=(200, 200, 255), centered=True)
+		
+		''' FRAME 2 - Paramètres de selection d'une case '''
+		self.widg_image_case = widget.Image((10, 10), size=(30, 30), border=1, path="", frame=frame2)
+		self.widg_label_case = widget.Label((40, 10), size=(150, 30), text="None", color=(100, 100, 100), frame=frame2)
+		self.widg_label_param = widget.Label((10, 40), size=(300, 30), text="Aucun(s) paramètre(s)", color=(100, 100, 100), frame=frame2)
 
-		widget.ImageButton((10, 10), size=(30, 30), action=self.type_mur, path="../image/mur.png", frame=frame3)
-		widget.ImageButton((10, 50), size=(30, 30), action=self.type_sol, path="../image/sol.png", frame=frame3)
-		widget.ImageButton((50, 10), size=(30, 30), action=self.type_fin, path="../image/fin.png", frame=frame3)
-		widget.ImageButton((50, 50), size=(30, 30), action=self.type_spawn, path="../image/spawn.png", frame=frame3)
+		widget.Button((10, 240), text="Changer mode", frame=frame2, action=self.change_mode, hoover_color=(200, 200, 255), centered=True)
+		self.widg_select_mode = widget.Label((120, 240), size=(150, 30), text="Mode: selection", text_color=(0, 0, 255), color=(100, 100, 100), frame=frame2)
+
+		''' FRAME 3 - Type de case à ajouter '''
+		widget.ImageButton((10, 10), size=(30, 30), action=(self.change_type, "mur"), path="../image/mur.png", frame=frame3)
+		widget.ImageButton((10, 50), size=(30, 30), action=(self.change_type, "sol"), path="../image/sol.png", frame=frame3)
+		widget.ImageButton((50, 10), size=(30, 30), action=(self.change_type, "fin"), path="../image/fin.png", frame=frame3)
+		widget.ImageButton((50, 50), size=(30, 30), action=(self.change_type, "spawn"), path="../image/spawn.png", frame=frame3)
+		widget.ImageButton((130, 10), size=(30, 30), action=(self.change_type, "porte"), path="../image/porte.png", frame=frame3)
+		widget.ImageButton((130, 50), size=(30, 30), action=(self.change_type, "interrupteur"), path="../image/interrupteur.png", frame=frame3)
 
 		self.build_level()
 
@@ -74,6 +107,10 @@ class Editeur():
 					objet.Escalier(position, (self.taille_case, self.taille_case))
 				if type_case == "spawn":
 					objet.SolSpawn(position, (self.taille_case, self.taille_case))
+				if type_case == "porte":
+					objet.PorteInterrupteur(position, (self.taille_case, self.taille_case), interrupteur=case["cible"])
+				if type_case == "interrupteur":
+					objet.Interrupteur(position, (self.taille_case, self.taille_case), cible=case["cible"])
 				y += 1
 			x += 1
 
@@ -97,6 +134,12 @@ class Editeur():
 			objet.SolSpawn(position, (self.taille_case, self.taille_case)) # une simple case Sol rouge
 		if self.type_case == "fin":
 			objet.Escalier(position, (self.taille_case, self.taille_case))
+		if self.type_case == "porte":
+			objet.PorteInterrupteur(position, (self.taille_case, self.taille_case), interrupteur=None)
+			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
+		if self.type_case == "interrupteur":
+			objet.Interrupteur(position, (self.taille_case, self.taille_case), cible=None)
+			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
 
 		self.niveau.coord["terrain"][pos_x][pos_y]["type"] = self.type_case
 
@@ -111,20 +154,103 @@ class Editeur():
 		if response:
 			response.kill()
 
-	def type_mur(self):
-		self.type_case = "mur"
-	def type_sol(self):
-		self.type_case = "sol"
-	def type_fin(self):
-		self.type_case = "fin"
-	def type_spawn(self):
-		self.type_case = "spawn"
+	def select_case(self, x, y, type_case=None):
+		pos_x = math.floor(x/self.taille_case)
+		pos_y = math.floor(y/self.taille_case)
+		if not type_case:
+			type_case = self.niveau.coord["terrain"][pos_x][pos_y]["type"]
 
-	# ============================= SAVE/LOAD NIVEAU ===========================
+		self.case_selection = [pos_x, pos_y]
+		self.widg_label_case.text = type_case
+		self.widg_image_case.path = "../image/"+type_case+".png"
+
+		''' On détruit tout les anciens widget de paramètre, dans le doute '''
+		if self.widg_button_cible:
+			self.widg_button_cible.kill()
+
+		''' On va créer les widget de pramètre correspondant à la case '''
+		if type_case == "porte":
+			nb_cible = len(self.niveau.coord["terrain"][pos_x][pos_y]["cible"])
+			self.widg_label_param.text = "- Porte reliée à ({}) mécanisme(s).".format(nb_cible)
+		elif type_case == "interrupteur":
+			nb_cible = len(self.niveau.coord["terrain"][pos_x][pos_y]["cible"])
+			self.widg_label_param.text = "- Interrupteur reliée à ({}) mécanisme(s).".format(nb_cible)
+			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
+		else:
+			self.widg_label_param.text = "Aucun(s) paramètre(s)"
+
+	def add_case_cible(self, x, y):
+		pos_x = math.floor(x/self.taille_case)
+		pos_y = math.floor(y/self.taille_case)
+		case_cible = self.niveau.coord["terrain"][pos_x][pos_y]
+
+		''' si la case ciblé est bien une cible potentielle ... '''
+		if case_cible["type"] == "interrupteur" or case_cible["type"] == "porte":
+			if not [pos_x, pos_y] in self.case_selection_cible: # si la case selectionné ne l'est pas
+				self.case_selection_cible.append([pos_x, pos_y])
+
+	def supp_case_cible(self, x, y):
+		pos_x = math.floor(x/self.taille_case)
+		pos_y = math.floor(y/self.taille_case)
+		case_cible = self.niveau.coord["terrain"][pos_x][pos_y]
+
+		if [pos_x, pos_y] in self.case_selection_cible:
+			self.case_selection_cible.remove([pos_x, pos_y])
+
+			''' on supprime ensuite le lien dans l'autre sens de la cible vers mecanisme '''
+			if case_cible["type"] == "interrupteur" or case_cible["type"] == "porte":
+				case_cible["cible"].remove(self.case_selection)
+
+	def valider_cible(self):
+		(x, y) = self.case_selection
+		case = self.niveau.coord["terrain"][x][y]
+
+		case["cible"] = self.case_selection_cible
+		for (cible_x, cible_y) in self.case_selection_cible:
+			if not [x, y] in self.niveau.coord["terrain"][cible_x][cible_y]["cible"]:
+				self.niveau.coord["terrain"][cible_x][cible_y]["cible"].append([x, y])
+
+		''' On met à jour les widget '''
+		nb_cible = len(case["cible"])
+		self.widg_label_param.text = "- Interrupteur reliée à ({}) mécanisme(s)".format(nb_cible)
+		self.widg_button_cible.text = "Selectionner cibles"
+		self.widg_button_cible.action = (self.change_mode, "selection cible")
+
+		self.case_selection_cible = []
+		self.type_mode = "selection"
+
+	# ============================= PARAMETRES EDITEURS ===========================
+
+	def change_type(self, type_case):
+		''' change le type de case selectionné '''
+		self.type_case = type_case
+
+	def change_mode(self, mode=None):
+		''' change le mode de selection ou d'edition du niveau '''
+		if mode:
+			self.type_mode = mode
+			if mode == "selection cible":
+				self.widg_select_mode.text = "Mode: selection (cible)"
+				self.widg_button_cible.text = "Valider"
+				self.widg_button_cible.action = self.valider_cible
+
+				(x, y) = self.case_selection
+				self.case_selection_cible = self.niveau.coord["terrain"][x][y]["cible"]
+
+		else:
+			if self.type_mode == "selection":
+				self.type_mode = "edition"
+				self.widg_select_mode.text = "Mode: edition"
+				self.case_selection = None
+				self.case_selection_cible = []
+			else:
+				self.type_mode = "selection"
+				self.widg_select_mode.text = "Mode: selection"
+				self.case_selection_cible = []
 
 	def save_level(self):
 		print("save")
-		lien = "../niveau/"+self._entry.text+".txt"
+		lien = "../niveau/"+self.widg_entry.text+".txt"
 		dic = {"spawn": self.niveau.spawn, "terrain":self.niveau.coord["terrain"], "objets":self.niveau.coord["objets"]}
 		with open(lien, "w") as fichier:
 			json_dic = json.dumps(dic)
@@ -132,7 +258,7 @@ class Editeur():
 
 	def load_level(self):
 		print("load")
-		lien = "../niveau/"+self._entry.text+".txt"
+		lien = "../niveau/"+self.widg_entry.text+".txt"
 		with open(lien, "r") as fichier:
 			json_dic = fichier.read()
 			dic = json.loads(json_dic)
@@ -172,12 +298,33 @@ while boucle:
 			(mouse_x, mouse_y) = pygame.mouse.get_pos()
 			if 0 <= mouse_x <= taille_level and 0 <= mouse_y <= taille_level: # si le clique intervient dans le niveau...
 				if event.dict["button"] == 3: # clique droit
-					editeur.supp_case(mouse_x, mouse_y)
+					if editeur.type_mode == "edition":
+						editeur.supp_case(mouse_x, mouse_y)
+					elif editeur.type_mode == "selection cible":
+						editeur.supp_case_cible(mouse_x, mouse_y) # sinon, si en selection ...
+
 				if event.dict["button"] == 1: # clique gauche
-					editeur.add_case(mouse_x, mouse_y)
+					if editeur.type_mode == "edition":
+						editeur.add_case(mouse_x, mouse_y) # si l'editeur est en mode edition ...
+					elif editeur.type_mode == "selection":
+						editeur.select_case(mouse_x, mouse_y) # sinon, si en selection ...
+					elif editeur.type_mode == "selection cible":
+						editeur.add_case_cible(mouse_x, mouse_y) # sinon, si en selection ...
 
 	widget.update()
 	objetEvent() # Evenements relatifs aux objets
+
+	''' On affiche les rectangle de selection '''
+	if editeur.case_selection:
+		(pos_x, pos_y) = editeur.case_selection
+		position = (pos_x*editeur.taille_case, pos_y*editeur.taille_case)
+		fenetre.blit(editeur._selection_rect, position)
+	if editeur.case_selection_cible:
+		for case in editeur.case_selection_cible:
+			(pos_x, pos_y) = case
+			position = (pos_x*editeur.taille_case, pos_y*editeur.taille_case)
+			fenetre.blit(editeur._selection_cible_rect, position)
+
 	pygame.display.flip() # raffraichissement de la fenêtre
 
 # ================================================================================================

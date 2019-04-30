@@ -16,12 +16,6 @@ pygame.init()
 fenetre = pygame.display.set_mode(taille) # création de la fenêtre
 fond = pygame.Surface(taille)
 fond.fill((0, 0, 0))
-#pygame.key.set_repeat(1) # Autorise la repetition d'event KEYDOWN si la touche est maintenue
-
-porte = objet.PorteInterrupteur((200, 200), (config["taille_case"], config["taille_case"]))
-inter = objet.Interrupteur((270, 200), (config["taille_case"], config["taille_case"]), cible=porte)
-inter2 = objet.Interrupteur((310, 200), (config["taille_case"], config["taille_case"]), cible=porte)
-porte.interrupteur = [inter, inter2]
 
 def objetEvent():
     objet.move() # On actualise la position des objets sur l'écran (collision etc)

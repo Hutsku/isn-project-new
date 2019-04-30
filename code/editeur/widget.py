@@ -4,7 +4,11 @@ from pygame.locals import *
 import time
 
 def update():
+	''' Petite bidouille avec les Frames pas très optimisé'''
+	for frame in Frame.group:
+		frame.image.fill(frame.color)
 	Widget.group.update()
+	Frame.group.update()
 
 def event(event):
 	for widget in Widget.group:
@@ -145,8 +149,11 @@ class Image(Widget):
 		# On affiche l'image
 		if self.path: 
 			self.image = pygame.image.load(self.path).convert_alpha()
+			self.image = pygame.transform.scale(self.image, self.size)
+		else:
+			self.image = pygame.Surface(self.size).convert_alpha()
+			self.image.fill((0, 0, 0, 0))
 
-		self.image = pygame.transform.scale(self.image, self.size)
 		self.rect = self.image.get_rect(center=self.rect.center)
 
 		# On créer un rect de reference (sans les positions)
@@ -176,7 +183,11 @@ class Button(Label):
 				rect.x += self.frame.rect.x
 				rect.y += self.frame.rect.y
 			if rect.collidepoint(pygame.mouse.get_pos()):
-				if self.action:
+				if type(self.action) ==  type((0, 0)): # si c'est un tuple en argument
+					fonction = self.action[0] # Le premier element est la fonction
+					arg = self.action[1] # Et le deuxième l'argument
+					fonction(arg)
+				elif self.action: # Si c'est une simple fonction ...
 					self.action()
 
 
@@ -199,7 +210,11 @@ class ImageButton(Image):
 				rect.y += self.frame.rect.y
 
 			if rect.collidepoint(pygame.mouse.get_pos()):
-				if self.action:
+				if type(self.action) ==  type((0, 0)): # si c'est un tuple en argument
+					fonction = self.action[0] # Le premier element est la fonction
+					arg = self.action[1] # Et le deuxième l'argument
+					fonction(arg)
+				elif self.action: # Si c'est une simple fonction ...
 					self.action()
 
 

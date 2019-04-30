@@ -78,6 +78,7 @@ class Personnage(Character):
 		Personnage.liste.add(self)
 
 		self.speed = 1
+		self.image.fill((255, 0, 0))
 
 	def gauche(self):
 		self.vx = -1
@@ -136,7 +137,6 @@ class Interrupteur(Objet):
 		self.hitbox = self.rect.copy()	
 
 	def action(self, cible=None):
-		print(self.statut)
 		self.statut =  not self.statut
 
 		if type(self.cible) == type([]):
@@ -157,7 +157,6 @@ class PorteInterrupteur(Porte):
 		self.interrupteur = interrupteur
 
 	def action(self, cible=None):
-		#print(self.statut)
 		''' Ouvre ou ferme la porte'''
 		if type(self.interrupteur) == type([]): # Si on a plusieurs interrupteurs ....
 			all_activated = True
