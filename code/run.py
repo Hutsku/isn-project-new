@@ -9,13 +9,16 @@ import objet
 import editeur.widget as widget
 
 #========================================== IMPORT CONFIIG ================================================
-config = config.getConfig()
-taille = config["taille_ecran"]
-
 pygame.init()
+
+config_dic = config.getConfig()
+taille = config_dic["taille_ecran"]
+
 fenetre = pygame.display.set_mode(taille) # création de la fenêtre
 fond = pygame.Surface(taille)
 fond.fill((0, 0, 0))
+
+config.init()
 
 def objetEvent():
     objet.move() # On actualise la position des objets sur l'écran (collision etc)

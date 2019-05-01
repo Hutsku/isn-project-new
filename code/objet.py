@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 
-
+import config
 		
 # ======================================================== CLASSE MERE ==================================================
 
@@ -100,9 +100,8 @@ class Mur(Objet):
 		super().__init__(position, dimension)
 		Mur.liste.add(self)
 
-		self.image = pygame.image.load("../image/mur.png")
+		self.image = config.getImage("mur")
 		self.image = pygame.transform.scale(self.image, dimension)
-
 
 class Sol(Objet):
 	liste = pygame.sprite.Group()
@@ -110,7 +109,7 @@ class Sol(Objet):
 		super().__init__(position, dimension)
 		Sol.liste.add(self)
 
-		self.image = pygame.image.load("../image/sol.png")
+		self.image = config.getImage("sol")
 		self.image = pygame.transform.scale(self.image, dimension)
 
 # ================================================ PORTE / INTERRUPTEUR ==================================================
@@ -125,6 +124,7 @@ class Porte(Objet):
 		self.image.fill((0, 200, 0))
 		self.statut = False # False => ferme
 
+
 class Interrupteur(Objet):
 	''' Interrupteur permettant d'activer un mecanisme / porte '''
 	liste = pygame.sprite.Group()
@@ -132,7 +132,9 @@ class Interrupteur(Objet):
 		super().__init__(position, dimension)
 		Interrupteur.liste.add(self)
 
-		self.image.fill((0, 200, 200))
+		self.image = config.getImage("interrupteur")
+		self.image = pygame.transform.scale(self.image, dimension)
+
 		self.cible = cible
 		self.statut = False
 
@@ -155,7 +157,8 @@ class PorteInterrupteur(Porte):
 		super().__init__(position, dimension)
 		PorteInterrupteur.liste.add(self)
 
-		self.image.fill((0, 200, 0))
+		self.image = config.getImage("porte")
+		self.image = pygame.transform.scale(self.image, dimension)
 		self.interrupteur = interrupteur
 
 	def action(self, cible=None):
@@ -197,7 +200,7 @@ class Escalier(Sol):
 		super().__init__(position, dimension)
 		Escalier.liste.add(self)
 
-		self.image = pygame.image.load("../image/fin.png")
+		self.image = config.getImage("escalier")
 		self.image = pygame.transform.scale(self.image, dimension)
 		self.hitbox = self.rect.copy()
 
