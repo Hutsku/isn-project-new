@@ -100,7 +100,8 @@ class Mur(Objet):
 		super().__init__(position, dimension)
 		Mur.liste.add(self)
 
-		self.image.fill((0, 0, 0))
+		self.image = pygame.image.load("../image/mur.png")
+		self.image = pygame.transform.scale(self.image, dimension)
 
 
 class Sol(Objet):
@@ -109,7 +110,8 @@ class Sol(Objet):
 		super().__init__(position, dimension)
 		Sol.liste.add(self)
 
-		self.image.fill((200, 200, 0))
+		self.image = pygame.image.load("../image/sol.png")
+		self.image = pygame.transform.scale(self.image, dimension)
 
 # ================================================ PORTE / INTERRUPTEUR ==================================================
 
@@ -195,7 +197,8 @@ class Escalier(Sol):
 		super().__init__(position, dimension)
 		Escalier.liste.add(self)
 
-		self.image.fill((0, 0, 255))
+		self.image = pygame.image.load("../image/fin.png")
+		self.image = pygame.transform.scale(self.image, dimension)
 		self.hitbox = self.rect.copy()
 
 		self.statut = False
