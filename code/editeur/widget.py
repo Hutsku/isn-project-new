@@ -4,11 +4,7 @@ from pygame.locals import *
 import time
 
 def update():
-	''' Petite bidouille avec les Frames pas très optimisé'''
-	for frame in Frame.group:
-		frame.image.fill(frame.color)
 	Widget.group.update()
-	Frame.group.update()
 
 def event(event):
 	for widget in Widget.group:
@@ -38,14 +34,12 @@ class Widget(pygame.sprite.Sprite):
 		self.frame = frame
 
 	def _build(self):
-		self.image = pygame.Surface(self.size).convert_alpha()
-		self.image.fill((255, 255, 255))
 		self.rect = self.image.get_rect()
 
 	def update(self):
-		# Met à jour l'affichage du Widget
-		self._build()
-
+		''' Met à jour l'affichage du Widget '''
+		#print(self.rect.topleft)
+		self.rect = self.image.get_rect(topleft=self.rect.topleft)
 		if self.frame:
 			self.frame.image.blit(self.image, self.rect)
 		else:
@@ -57,66 +51,118 @@ class Widget(pygame.sprite.Sprite):
 		pass
 
 	def set_pos(self, pos_x, pos_y):
-		self.rect.center = (pos_x, pos_y)
+		self.rect.topleft = (pos_x, pos_y)
 
 	def resize(self, size):
 		self.image = pygame.transform.scale(self.image, size)
 		self.size = size
-		self.rect = self.image.get_rect(center=self.rect.center)
+		self.rect = self.image.get_rect(center=self.rect.topleft)
 
 
 class Label(Widget):
 	def __init__(self, position, size=(100, 30), color = [255, 255, 255], border = 0, border_color = [0, 0, 0], text = "", text_color = [0, 0, 0],
-	             centered = False, font = "arial", police = 14, adapt=False, frame=None, bold=False, hoover_color=None):
+	             centered = False, font = "arial", police = 14, frame=None, bold=False, hoover_color=None):
 
 		super().__init__(position, size, frame)
 		self.text = text
 		self.font = font
 		self.police = police
-		self.adapt = adapt
 		self.bold = bold
+		self.text_color = text_color
+		self._sys_font = pygame.font.SysFont(self.font, self.police, bold=self.bold, italic=False)
+		self._obj_text = self._sys_font.render(self.text, False, self.text_color)
 
 		self.border = border
 		self.border_color = border_color
 		self.color = color
-		self.text_color = text_color
 		self.centered = centered
 		self._indent = 10
+
 		self.hoover_color = hoover_color
+		if not self.hoover_color:
+			self.hoover_color = self.color
 		self._hoover = False
+		self._current_color = self.color
 
 		self._build()
 
 	def _build(self):
-		# On remplit la couleur de fond
+		''' On change le fond '''
 		if self._hoover:
-			self.image.fill(self.hoover_color) 
+			self._current_color = self.hoover_color
 		else:
-			self.image.fill(self.color)
+			self._current_color = self.color
 
-		# On initialise le texte
-		font = pygame.font.SysFont(self.font, self.police, bold=self.bold, italic=False)
+		self.image.fill(self._current_color)
 
-		if self.adapt:
-			self.rect.width = font.size(self.text)[0] + 2*self._indent
-			self.resize((self.rect.width, self.rect.height))
-
-		# On créer un rect de reference (sans les positions)
+		''' On dessine les bords du cadre '''
 		rect = self.rect.copy() 
 		rect.x, rect.y = 0, 0
 
-		if self.border:
-			border = pygame.draw.rect(self.image, self.border_color, rect, self.border)
+		pygame.draw.rect(self.image, self._current_color, rect, self.border)
 
-		if self.text:
-			obj_text = font.render(self.text, False, self.text_color)
-			if self.centered:
-				textpos = obj_text.get_rect(centerx = self.rect.width/2, centery = self.rect.height/2)
-			else:
-				textpos = obj_text.get_rect(x = self._indent, centery = self.rect.height/2)
+		''' On affiche le texte '''
+		if self.centered:
+				textpos = self._obj_text.get_rect(centerx = self.rect.width/2, centery = self.rect.height/2)
+		else:
+			textpos = self._obj_text.get_rect(x = self._indent, centery = self.rect.height/2)
 
-			# Une fois les paramètres appliqués, on colle le texte.
-			self.image.blit(obj_text, textpos)
+		self.image.blit(self._obj_text, textpos)
+
+	def change_text(self, text=None, color=None, police=None, font=None, bold=None):
+		''' Fonction permettant de changer le text du widget '''
+		if not text:
+			text=self.text
+		if not color:
+			color=self.text_color
+		if not police:
+			police=self.police
+		if not font:
+			font=self.font
+		if not bold:
+			bold=self.bold
+
+		''' On recrée l'objet Font si besoin '''
+		if font != self.font or bold != self.bold or police != self.police: # Si la police est changée ...
+			self.font = font
+			self.bold = bold
+			self.police = police
+			self._sys_font = pygame.font.SysFont(font, police, bold=bold, italic=False)
+
+		''' On recrée l'objet Text si besoin '''
+		if text != self.text or color != self.color:
+			self.text = text
+			self.text_color = color
+			self._obj_text = self._sys_font.render(self.text, False, self.text_color)
+
+		self._build()
+
+	def change_border(self, color=None, border=None):
+		''' Fonction permettant de modifier les bordures '''
+		if not color:
+			color=self.border_color
+		if not border:
+			border=self.border
+
+		self.border = border
+		self.border_color = color
+
+		self._build()
+		
+	def change_color(self, color=None, hoover_color=None):
+		if not color:
+			color=self.color
+		if not hoover_color:
+			hoover_color=self.hoover_color
+
+		self.color=color
+		self.hoover_color=hoover_color
+		if self._hoover:
+			self._current_color = self.hoover_color
+		else:
+			self._current_color = self.color
+
+		self._build()
 
 	def event(self, event):
 		if self.hoover_color:
@@ -126,8 +172,12 @@ class Label(Widget):
 				rect.y += self.frame.rect.y
 			if rect.collidepoint(pygame.mouse.get_pos()):
 				self._hoover = True
+				if not self._current_color == self.hoover_color:
+					self.change_color()
 			else:
 				self._hoover = False
+				if not self._current_color == self.color:
+					self.change_color()
 
 
 class Image(Widget):
@@ -146,7 +196,7 @@ class Image(Widget):
 		self._build()
 
 	def _build(self):
-		# On affiche l'image
+		''' On affiche l'image '''
 		if self.path: 
 			self.image = pygame.image.load(self.path).convert_alpha()
 			self.image = pygame.transform.scale(self.image, self.size)
@@ -154,22 +204,39 @@ class Image(Widget):
 			self.image = pygame.Surface(self.size).convert_alpha()
 			self.image.fill((0, 0, 0, 0))
 
-		self.rect = self.image.get_rect(center=self.rect.center)
-
-		# On créer un rect de reference (sans les positions)
-		rect = self.rect.copy() 
-		rect.x, rect.y = 0, 0
-
+		''' On dessine les bords du cadre '''
 		if self.border:
-			border = pygame.draw.rect(self.image, self.border_color, rect, self.border)
+			rect = self.rect.copy() 
+			rect.x, rect.y = 0, 0
+			pygame.draw.rect(self.image, self.border_color, rect, self.border)
+
+	def change_border(self, color=None, border=None):
+		''' Fonction permettant de modifier les bordures '''
+		if not color:
+			color=self.border_color
+		if not border:
+			border=self.border
+
+		self.border = border
+		self.border_color = color
+		
+		self._build()
+
+	def change_image(self, path=None):
+		if not path:
+			path=self.path
+
+		self.path = path
+
+		self._build()
 
 
 class Button(Label):
 	def __init__(self, position, size=(100, 30), border = 0, border_color = [0, 0, 0], color = [255, 255, 255], text = "", text_color = [0, 0, 0],
-	 			centered = False, font = "arial", police = 14, adapt=False, action = None, frame=None, bold=False, hoover_color=None):
+	 			centered = False, font = "arial", police = 14, action = None, frame=None, bold=False, hoover_color=None):
 
 		super().__init__(position, size, color=color, border=border, border_color=border_color, text=text, text_color=text_color,
-					centered=centered, font=font, police=police, adapt=adapt, frame=frame, bold=bold, hoover_color=hoover_color)
+					centered=centered, font=font, police=police, frame=frame, bold=bold, hoover_color=hoover_color)
 
 		self.action = action
 
@@ -220,10 +287,10 @@ class ImageButton(Image):
 
 class Entry(Label):
 	def __init__(self, position, size=(100, 30), text = "", border = 0, border_color = [0, 0, 0], color = [255, 255, 255], text_color = [0, 0, 0], 
-    			font = "arial", police = 14, adapt=False, limit_character=None, frame=None):
+    			font = "arial", police = 14, frame=None):
 
 		super().__init__(position, size, color=color, border=border, border_color=border_color, text=text, text_color=text_color,
-				centered=None, font=font, police=police, adapt=adapt, frame=frame)
+				centered=None, font=font, police=police, frame=frame)
 
 		self.unicode = True
 		self._time = time.time()
@@ -232,40 +299,7 @@ class Entry(Label):
 		self.cursor = "|"
 		self._focus = False # Définit si le widget à le "focus" ou non
 
-		if not limit_character:
-			self.limit_character = round(self.rect.width/9)
-		else:
-			self.limit_character = limit_character
-
 		self._build()
-
-	def _build(self):
-		# On remplit la couleur de fond
-		self.image.fill(self.color) 
-
-		# On initialise le texte
-		font = pygame.font.SysFont(self.font, self.police, bold=False, italic=False)
-
-		if self.adapt:
-			self.rect.width = font.size(self.text)[0] + 2*self._indent
-			self.resize((self.rect.width, self.rect.height))
-
-		# On créer un rect de reference (sans les positions)
-		rect = self.rect.copy() 
-		rect.x, rect.y = 0, 0
-
-		if self.border:
-			border = pygame.draw.rect(self.image, self.border_color, rect, self.border)
-
-		if self.text:
-			obj_text = font.render(self.text, False, self.text_color)
-			if self.centered:
-				textpos = obj_text.get_rect(centerx = self.rect.width/2, centery = self.rect.height/2)
-			else:
-				textpos = obj_text.get_rect(x = self._indent, centery = self.rect.height/2)
-
-			# Une fois les paramètres appliqués, on colle le texte.
-			self.image.blit(obj_text, textpos)
 
 	def event(self, event):
 		if event.type == KEYDOWN:
@@ -283,39 +317,30 @@ class Entry(Label):
 				rect.y += self.frame.rect.y
 
 			if rect.collidepoint(pygame.mouse.get_pos()):
-				print("entry")
 				self._focus = True
 			else:
+				if self._focus:
+					self._build()
 				self._focus = False
 
 	def update(self):
-		text = self.text
-
-		self._build()
 		self.verify_delay_cursor() # On update le curseur
 
-		# On initialise le texte à afficher (avec le curseur)
-		font = pygame.font.SysFont(self.font, self.police, bold=False, italic=False)
-		if not self._state_cursor:
-			obj_text = font.render(self.text, False, self.text_color)
-		else:
-			obj_text = font.render(self.text+self.cursor, False, self.text_color)
+		# On initialise le texte à afficher (avec le curseur ou non)
+		if self._focus:
+			rect = self.rect.copy() 
+			rect.x, rect.y = 0, 0
+			pygame.draw.rect(self.image, (255, 0, 0), rect, 1)
 
-		textpos = obj_text.get_rect(x = self._indent, centery = self.rect.height/2)
-		self.image.blit(obj_text, textpos) # On applique le texte à l'image ...
-
-		if self.frame:
-			self.frame.image.blit(self.image, self.rect)
-		else:
-			pygame.display.get_surface().blit(self.image, self.rect)
+		super().update()
 
 	def print_key(self, key):
 		if key == "\x08": # Pour la touche Delete
-			self.text = self.text[:-1]
+			self.change_text(text=self.text[:-1])
 		elif key == "\r": # Pour la touche Enter
 			pass
 		else:
-			self.text += key
+			self.change_text(text=self.text+key)
 
 	def verify_delay_cursor(self):
 		if self._focus:
@@ -342,9 +367,10 @@ class Frame(Widget):
 		self.border_color = border_color
 		self.color = color
 
-		self.image.fill(self.color)
+		self._build()
 
 	def _build(self): 
+		self.image.fill(self.color)
 		if self.border:
 			rect = self.rect.copy() 
 			rect.x, rect.y = 0, 0

@@ -47,9 +47,14 @@ class Editeur():
 		self.widg_select_mode = None
 		self.widg_label_param = None 
 		self.widg_button_cible = None
+		self.widg_button_mode = None
+		self.widg_button_test = None # Bouton permettant de tester le niveau en cours
 		self.frame1 = None
 		self.frame2 = None
 		self.frame3 = None
+
+		''' Variable pour le personnage, seulement en mode test '''
+		self.perso = None 
 
 		self._init_editeur()
 
@@ -69,16 +74,17 @@ class Editeur():
 		self.frame3 = frame3
 
 		''' FRAME 1 - Sauvegarde / Ouverture d'un niveau '''
-		self.widg_entry = widget.Entry((10, 10), adapt=True, border=0, border_color=(255, 0, 0), text="niveau1", frame=frame1)
+		self.widg_entry = widget.Entry((10, 10), border=0, border_color=(255, 0, 0), text="niveau1", frame=frame1)
 		widget.Button((150, 50), text="Ouvrir", frame=frame1, action=self.load_level, hoover_color=(200, 200, 255), centered=True)
 		widget.Button((10, 50), text="Enregistrer", frame=frame1, action=self.save_level, hoover_color=(200, 200, 255), centered=True)
 		
 		''' FRAME 2 - Paramètres de selection d'une case '''
 		self.widg_image_case = widget.Image((10, 10), size=(30, 30), border=1, path="", frame=frame2)
 		self.widg_label_case = widget.Label((40, 10), size=(150, 30), text="None", color=(100, 100, 100), frame=frame2)
-		self.widg_label_param = widget.Label((10, 40), size=(300, 30), text="Aucun(s) paramètre(s)", color=(100, 100, 100), frame=frame2)
+		self.widg_label_param = widget.Label((10, 40), size=(260, 30), text="Aucun(s) paramètre(s)", color=(100, 100, 100), frame=frame2)
 
-		widget.Button((10, 240), text="Changer mode", frame=frame2, action=self.change_mode, hoover_color=(200, 200, 255), centered=True)
+		self.widg_button_test = widget.Button((10, 200), text="Tester niveau", frame=frame2, action=(self.change_mode, "test niveau"), hoover_color=(200, 200, 255), centered=True)
+		self.widg_button_mode = widget.Button((10, 240), text="Changer mode", frame=frame2, action=(self.change_mode, "edition"), hoover_color=(200, 200, 255), centered=True)
 		self.widg_select_mode = widget.Label((120, 240), size=(150, 30), text="Mode: selection", text_color=(0, 0, 255), color=(100, 100, 100), frame=frame2)
 
 		''' FRAME 3 - Type de case à ajouter '''
@@ -161,8 +167,8 @@ class Editeur():
 			type_case = self.niveau.coord["terrain"][pos_x][pos_y]["type"]
 
 		self.case_selection = [pos_x, pos_y]
-		self.widg_label_case.text = type_case
-		self.widg_image_case.path = "../image/"+type_case+".png"
+		self.widg_label_case.change_text(text=type_case)
+		self.widg_image_case.change_image(path="../image/"+type_case+".png")
 
 		''' On détruit tout les anciens widget de paramètre, dans le doute '''
 		if self.widg_button_cible:
@@ -171,16 +177,16 @@ class Editeur():
 		''' On va créer les widget de pramètre correspondant à la case '''
 		if type_case == "porte":
 			nb_cible = len(self.niveau.coord["terrain"][pos_x][pos_y]["cible"])
-			self.widg_label_param.text = "- Porte reliée à ({}) mécanisme(s).".format(nb_cible)
+			self.widg_label_param.change_text(text="- Porte reliée à ({}) mécanisme(s).".format(nb_cible))
 			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
 			self.case_selection_cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
 		elif type_case == "interrupteur":
 			nb_cible = len(self.niveau.coord["terrain"][pos_x][pos_y]["cible"])
-			self.widg_label_param.text = "- Interrupteur reliée à ({}) mécanisme(s).".format(nb_cible)
+			self.widg_label_param.change_text(text="- Interrupteur reliée à ({}) mécanisme(s).".format(nb_cible))
 			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
 			self.case_selection_cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
 		else:
-			self.widg_label_param.text = "Aucun(s) paramètre(s)"
+			self.widg_label_param.change_text(text="Aucun(s) paramètre(s)")
 			self.case_selection_cible = []
 
 	def add_case_cible(self, x, y):
@@ -230,28 +236,66 @@ class Editeur():
 		''' change le type de case selectionné '''
 		self.type_case = type_case
 
-	def change_mode(self, mode=None):
+	def change_mode(self, mode):
 		''' change le mode de selection ou d'edition du niveau '''
-		if mode:
-			self.type_mode = mode
-			if mode == "selection cible":
-				self.widg_select_mode.text = "Mode: selection (cible)"
-				self.widg_button_cible.text = "Valider"
-				self.widg_button_cible.action = self.valider_cible
+		self.type_mode = mode
 
-				(x, y) = self.case_selection
-				self.case_selection_cible = self.niveau.coord["terrain"][x][y]["cible"]
+		if mode == "test niveau":
+			self.widg_select_mode.change_text(text="Mode: Test du niveau")
+			self.widg_button_test.change_text(text="Arrêter test")
+			self.widg_button_test.action = (self.change_mode, "selection")
+			self.case_selection = None
+			self.case_selection_cible = []
+			taille_case = config.getConfig()["taille_case"]
+
+			''' On va rechercher et ajouter les cible à leur mecanisme (l'objet lui-même, pas les coordonnées) '''
+			for porte in objet.PorteInterrupteur.liste:
+				list_cible = []
+				for (cible_x, cible_y) in porte.interrupteur:
+					position_cible = (cible_x*taille_case, cible_y*taille_case)
+					for interrupteur in objet.Interrupteur.liste:
+						if interrupteur.rect.topleft == position_cible:
+							list_cible.append(interrupteur)
+				porte.interrupteur = list_cible
+
+			for interrupteur in objet.Interrupteur.liste:
+				list_cible = []
+				for (cible_x, cible_y) in interrupteur.cible:
+					position_cible = (cible_x*taille_case, cible_y*taille_case)
+					for porte in objet.PorteInterrupteur.liste:
+						if porte.rect.topleft == position_cible:
+							list_cible.append(porte)
+				interrupteur.cible = list_cible
+
+			taille_perso = config.getConfig()["taille_personnage"]
+			spawn = (self.niveau.spawn[0]*self.taille_case, self.niveau.spawn[1]*self.taille_case)
+			self.perso = objet.Personnage(spawn, (taille_perso, taille_perso))
 
 		else:
-			if self.type_mode == "selection":
-				self.type_mode = "edition"
-				self.widg_select_mode.text = "Mode: edition"
-				self.case_selection = None
-				self.case_selection_cible = []
-			else:
-				self.type_mode = "selection"
-				self.widg_select_mode.text = "Mode: selection"
-				self.case_selection_cible = []
+			self.widg_button_test.change_text(text="Tester niveau")
+			self.widg_button_test.action = (self.change_mode, "test niveau")
+			if self.perso:
+				self.perso.kill()
+				self.perso = None
+
+		if mode == "selection cible":
+			self.widg_select_mode.change_text(text="Mode: selection (cible)")
+			self.widg_button_cible.change_text(text="Valider")
+			self.widg_button_cible.action = self.valider_cible
+
+			(x, y) = self.case_selection
+			self.case_selection_cible = self.niveau.coord["terrain"][x][y]["cible"]
+
+		elif mode == "edition":
+			self.widg_select_mode.change_text(text="Mode: edition")
+			self.widg_button_mode.action = (self.change_mode, "selection")
+			self.case_selection = None
+			self.case_selection_cible = []
+
+		elif mode == "selection":
+			self.widg_select_mode.change_text(text="Mode: selection")
+			self.widg_button_mode.action = (self.change_mode, "edition")
+			self.case_selection_cible = []
 
 	def save_level(self):
 		print("save")
@@ -284,57 +328,90 @@ def objetEvent():
 # ===================================== BOUCLE PRINCIPALE ========================================
 
 editeur = Editeur(taille_editeur, taille_level)
+key_trad = {"a": 113, "z":119, "d":100, "q":97, "s":115} # traduction unicode et n° key
 
+clock = pygame.time.Clock()
 boucle = True
 while boucle:
+	clock.tick()
+	pygame.display.set_caption( str(clock.get_fps()))
 	fenetre.blit(fond, (0, 0)) # on colle le fond
 
-	# on gère les evenements claviers et souris 
-	for event in pygame.event.get():
-		widget.event(event) # Gestion des evenements sur les widget (pour les boutons par ex)
+	# ========================== CHECK DU MODE TEST OU NON =====================================
 
-		if event.type == QUIT: #si clic sur croix rouge
-			boucle = False #fin de boucle
+	if not editeur.type_mode == "test niveau":
+		# on gère les evenements claviers et souris 
+		for event in pygame.event.get():
+			widget.event(event) # Gestion des evenements sur les widget (pour les boutons par ex)
 
-		if event.type == KEYDOWN:
-			pass
+			if event.type == QUIT: #si clic sur croix rouge
+				boucle = False #fin de boucle
 
-		if event.type == MOUSEBUTTONDOWN:
-			(mouse_x, mouse_y) = pygame.mouse.get_pos()
-			if 0 <= mouse_x <= taille_level and 0 <= mouse_y <= taille_level: # si le clique intervient dans le niveau...
-				if event.dict["button"] == 3: # clique droit
-					if editeur.type_mode == "edition":
-						editeur.supp_case(mouse_x, mouse_y)
-					elif editeur.type_mode == "selection cible":
-						editeur.supp_case_cible(mouse_x, mouse_y) # sinon, si en selection ...
+			if event.type == MOUSEBUTTONDOWN:
+				(mouse_x, mouse_y) = pygame.mouse.get_pos()
+				if 0 <= mouse_x <= taille_level and 0 <= mouse_y <= taille_level: # si le clique intervient dans le niveau...
+					if event.dict["button"] == 3: # clique droit
+						if editeur.type_mode == "edition":
+							editeur.supp_case(mouse_x, mouse_y)
+						elif editeur.type_mode == "selection cible":
+							editeur.supp_case_cible(mouse_x, mouse_y) # sinon, si en selection ...
 
-				if event.dict["button"] == 1: # clique gauche
-					if editeur.type_mode == "edition":
-						editeur.add_case(mouse_x, mouse_y) # si l'editeur est en mode edition ...
-					elif editeur.type_mode == "selection":
-						editeur.select_case(mouse_x, mouse_y) # sinon, si en selection ...
-					elif editeur.type_mode == "selection cible":
-						editeur.add_case_cible(mouse_x, mouse_y) # sinon, si en selection ...
+					if event.dict["button"] == 1: # clique gauche
+						if editeur.type_mode == "edition":
+							editeur.add_case(mouse_x, mouse_y) # si l'editeur est en mode edition ...
+						elif editeur.type_mode == "selection":
+							editeur.select_case(mouse_x, mouse_y) # sinon, si en selection ...
+						elif editeur.type_mode == "selection cible":
+							editeur.add_case_cible(mouse_x, mouse_y) # sinon, si en selection ...
 
-	widget.update()
-	objetEvent() # Evenements relatifs aux objets
+		widget.update()
+		objet.update()
 
-	''' On affiche les rectangle de selection '''
-	if editeur.case_selection:
-		(pos_x, pos_y) = editeur.case_selection
-		position = (pos_x*editeur.taille_case, pos_y*editeur.taille_case)
-		fenetre.blit(editeur._selection_rect, position)
-	if editeur.case_selection_cible:
-		taille_case = editeur.taille_case
-		for case in editeur.case_selection_cible:
-			(pos_x, pos_y) = case
+		''' On affiche les rectangle de selection '''
+		if editeur.case_selection:
+			(pos_x, pos_y) = editeur.case_selection
 			position = (pos_x*editeur.taille_case, pos_y*editeur.taille_case)
-			fenetre.blit(editeur._selection_cible_rect, position)
+			fenetre.blit(editeur._selection_rect, position)
+		if editeur.case_selection_cible:
+			taille_case = editeur.taille_case
+			for case in editeur.case_selection_cible:
+				(pos_x, pos_y) = case
+				position = (pos_x*editeur.taille_case, pos_y*editeur.taille_case)
+				fenetre.blit(editeur._selection_cible_rect, position)
 
-			case_selection = editeur.case_selection
-			position_debut = ((pos_x*taille_case)+taille_case/2, (pos_y*taille_case)+taille_case/2)
-			position_fin = ((case_selection[0]*taille_case)+taille_case/2, (case_selection[1]*taille_case)+taille_case/2)
-			pygame.draw.line(fenetre, (0, 0, 255), position_debut, position_fin)
+				case_selection = editeur.case_selection
+				position_debut = ((pos_x*taille_case)+taille_case/2, (pos_y*taille_case)+taille_case/2)
+				position_fin = ((case_selection[0]*taille_case)+taille_case/2, (case_selection[1]*taille_case)+taille_case/2)
+				pygame.draw.line(fenetre, (0, 0, 255), position_debut, position_fin)
+
+	else:
+		perso = editeur.perso
+		for event in pygame.event.get():
+			widget.event(event) # Gestion des evenements sur les widget (pour les boutons par ex)
+			if event.type == QUIT: #si clic sur croix rouge
+				boucle = False
+
+			if event.type == KEYDOWN:
+				if event.unicode == "d":
+					perso.droite()
+				if event.unicode == "q":
+					perso.gauche()
+				if event.unicode == "z":
+					perso.haut()
+				if event.unicode == "s":
+					perso.bas()
+				if event.unicode == "a":
+					perso.action()
+
+			if event.type == KEYUP:
+				''' L'event KEYUP ne donne pas de traduction unicode. J'utilise donc un dic fait maison '''
+				if key_trad["d"] == event.key or key_trad["q"] == event.key:
+					perso.vx = 0
+				if key_trad["z"] == event.key or key_trad["s"] == event.key:
+					perso.vy = 0
+
+		widget.update()
+		objetEvent() # Evenements relatifs aux objets
 
 	pygame.display.flip() # raffraichissement de la fenêtre
 

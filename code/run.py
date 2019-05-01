@@ -35,8 +35,11 @@ key_trad = {"a": 113, "z":119, "d":100, "q":97, "s":115} # traduction unicode et
 
 app = application.Application()
 app.start()
+clock = pygame.time.Clock()
 boucle = True
-while boucle:	
+while boucle:	 
+    clock.tick()
+    pygame.display.set_caption( str(clock.get_fps()))
     if application.check_statut_quitter(app):
         boucle = False
 
