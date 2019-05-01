@@ -36,6 +36,11 @@ class Widget(pygame.sprite.Sprite):
 	def _build(self):
 		self.rect = self.image.get_rect()
 
+	def kill(self):
+		if self.frame:
+			self.frame._build()
+		super().kill()
+
 	def update(self):
 		''' Met à jour l'affichage du Widget '''
 		#print(self.rect.topleft)

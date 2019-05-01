@@ -16,6 +16,7 @@ taille_editeur = config.getConfig()["taille_editeur"]
 taille_ecran = (taille_editeur, taille_level)
 pygame.init() #initialisation des modules py.game
 fenetre = pygame.display.set_mode(taille_ecran) # creation de la fenetre (avec taille en parametre)
+config.init()
 
 fond = pygame.Surface(taille_ecran) # Création du fond, de taille equivalente à la fenêtre
 fond.fill((100, 100, 100)) # on colorie en gris
