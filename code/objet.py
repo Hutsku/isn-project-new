@@ -159,17 +159,16 @@ class Porte(Objet):
 		self.image.fill((0, 200, 0))
 		self.statut = False # False => ferme
 
-
 class Interrupteur(Objet):
 	''' Interrupteur permettant d'activer un mecanisme / porte '''
 	liste = pygame.sprite.Group()
-	def __init__(self, position, dimension, cible=None):
+	def __init__(self, position, dimension, cible=[]):
 		super().__init__(position, dimension)
 		Interrupteur.liste.add(self)
 		self.dimension = dimension
 		self.statut = False
 
-		self.image = config.getImage("interrupteur_off")
+		self.image = config.getImage("interrupteur")
 		self.image = pygame.transform.scale(self.image, dimension)
 
 		self.cible = cible
@@ -184,18 +183,64 @@ class Interrupteur(Objet):
 			for cible in self.cible:
 				cible.action()
 				if self.statut:
-					self.image = config.getImage("interrupteur_on")
+					self.image = config.getImage("interrupteur on")
 					self.image = pygame.transform.scale(self.image, self.dimension)
 					self.statut = True
 				if self.statut == False:
-					self.image = config.getImage("interrupteur_off")
+					self.image = config.getImage("interrupteur")
 					self.image = pygame.transform.scale(self.image, self.dimension)
 					self.statut = False
 		elif self.cible:
 			self.cible.action()
-			self.image = config.getImage("interrupteur_off")
+			self.image = config.getImage("interrupteur")
 			self.image = pygame.transform.scale(self.image, self.dimension)
 
+class InterrupteurTimer(Interrupteur):
+	''' Interrupteur permettant d'activer un mecanisme / porte '''
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension, cible=[]):
+		super().__init__(position, dimension, cible=cible)
+		InterrupteurTimer.liste.add(self)
+
+		self.frame_activation = 500 # nb de frame de l'activation
+		self._frame_time = 0 # timer
+
+	def update(self):
+		''' A chaque frame, on decroit le compteur si besoin '''
+		if self._frame_time:
+			self._frame_time -= 1
+		elif self.statut:
+			self.action()
+
+		super().update()
+
+	def action(self, cible=None):
+		self.statut = not self.statut
+
+		if type(self.cible) == type([]):
+			for cible in self.cible:
+				cible.action()
+				if self.statut:
+					self.image = config.getImage("interrupteur on")
+					self.image = pygame.transform.scale(self.image, self.dimension)
+					self.statut = True
+					self._frame_time = self.frame_activation # On active le timer
+				if self.statut == False:
+					self.image = config.getImage("interrupteur")
+					self.image = pygame.transform.scale(self.image, self.dimension)
+					self.statut = False
+					self._frame_time = 0
+		elif self.cible:
+			if self.statut:
+				self.image = config.getImage("interrupteur on")
+				self.image = pygame.transform.scale(self.image, self.dimension)
+				self.statut = True
+				self._frame_time = self.frame_activation # On active le timer
+			if self.statut == False:
+				self.image = config.getImage("interrupteur")
+				self.image = pygame.transform.scale(self.image, self.dimension)
+				self.statut = False
+				self._frame_time = 0
 
 class PorteInterrupteur(Porte):
 	''' Porte qui s'ouvre à l'aide d'un interrupteur '''
@@ -217,20 +262,22 @@ class PorteInterrupteur(Porte):
 					all_activated = False
 
 			if all_activated: # on regarde si ils sont tous activés et on ouvre la porte
-				if not self.statut:
-					self.image = config.getImage("sol")
-					self.image = pygame.transform.scale(self.image, self.size)
+				self.image = config.getImage("sol")
+				self.image = pygame.transform.scale(self.image, self.size)
 				self.statut = True
 			else:
-				if self.statut:
-					self.image = config.getImage("porte")
-					self.image = pygame.transform.scale(self.image, self.size)
+				self.image = config.getImage("porte")
+				self.image = pygame.transform.scale(self.image, self.size)
 				self.statut = False
 				
 		elif self.interrupteur:
 			if self.interrupteur.statut: # si l'interrupteur est activé, on ouvre la porte
+				self.image = config.getImage("sol")
+				self.image = pygame.transform.scale(self.image, self.size)
 				self.statut = True
 			else:
+				self.image = config.getImage("porte")
+				self.image = pygame.transform.scale(self.image, self.size)
 				self.statut = False
 		
 # ==================================================== PIEGES ===========================================================
@@ -331,7 +378,6 @@ class SolSpawn(Sol):
 		SolSpawn.liste.add(self)
 
 		self.image.fill((255, 0, 0))
-
 
 class Escalier(Sol):
 	liste = pygame.sprite.Group()
