@@ -65,6 +65,7 @@ while boucle:
         fond.fill((100, 100, 100))
         perso = application.get_perso(app)
         fenetre.blit(fond, (0, 0)) # on colle le fond
+        retour_menu = False 
 
         # on gère les evenements claviers et souris 
         for event in pygame.event.get():
@@ -83,6 +84,10 @@ while boucle:
                     perso.bas()
                 if event.unicode == "a":
                     perso.action()
+                    
+                 if event.unicode == "p":  #lorsqu'on appuie sur la touche "p" on retourne au menu
+                   retour_menu = True
+					
 
             if event.type == KEYUP:
                 ''' L'event KEYUP ne donne pas de traduction unicode. J'utilise donc un dic fait maison '''
@@ -97,6 +102,7 @@ while boucle:
         widget.update()
 
         pygame.display.update() # raffraichissement de la fenêtre
+        if retour_menu: app.menu()
 
 # ================================================================================================
 # '''
