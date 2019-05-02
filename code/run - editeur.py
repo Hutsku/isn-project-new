@@ -69,7 +69,7 @@ class Editeur():
 		''' Définition des Frames (cadres) de l'editeur '''
 		frame1 = widget.Frame((self.height+10, 10), (280, 90), color=(100, 100,100), border=1)
 		frame2 = widget.Frame((self.height+10, 110), (280, 280), color=(100, 100,100), border=1)
-		frame3 = widget.Frame((self.height+10, 400), (280, 90), color=(100, 100,100), border=1)
+		frame3 = widget.Frame((self.height+10, 400), (280, 130), color=(100, 100,100), border=1)
 		self.frame1 = frame1
 		self.frame2 = frame2
 		self.frame3 = frame3
@@ -96,6 +96,8 @@ class Editeur():
 		widget.ImageButton((130, 10), size=(30, 30), action=(self.change_type, "porte"), path="../image/porte.png", frame=frame3)
 		widget.ImageButton((130, 50), size=(30, 30), action=(self.change_type, "interrupteur"), path="../image/interrupteur.png", frame=frame3)
 		widget.ImageButton((90, 10), size=(30, 30), action=(self.change_type, "pic"), path="../image/pic.png", frame=frame3)
+		widget.ImageButton((90, 50), size=(30, 30), action=(self.change_type, "pic intervalle"), path="../image/pic.png", frame=frame3)
+		widget.ImageButton((90, 90), size=(30, 30), action=(self.change_type, "pic interrupteur"), path="../image/pic.png", frame=frame3)
 
 		self.build_level()
 
@@ -119,6 +121,12 @@ class Editeur():
 					objet.PorteInterrupteur(position, (self.taille_case, self.taille_case), interrupteur=case["cible"])
 				if type_case == "interrupteur":
 					objet.Interrupteur(position, (self.taille_case, self.taille_case), cible=case["cible"])
+				if type_case == "pic":
+					objet.Pic(position, (self.taille_case, self.taille_case))
+				if type_case == "pic intervalle":
+					objet.PicIntervalle(position, (self.taille_case, self.taille_case))
+				if type_case == "pic interrupteur":
+					objet.PicInterrupteur(position, (self.taille_case, self.taille_case), interrupteur=case["cible"])
 				y += 1
 			x += 1
 
@@ -143,15 +151,19 @@ class Editeur():
 		if self.type_case == "fin":
 			objet.Escalier(position, (self.taille_case, self.taille_case))
 		if self.type_case == "porte":
-			objet.PorteInterrupteur(position, (self.taille_case, self.taille_case), interrupteur=None)
+			objet.PorteInterrupteur(position, (self.taille_case, self.taille_case))
 			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
 		if self.type_case == "interrupteur":
-			objet.Interrupteur(position, (self.taille_case, self.taille_case), cible=None)
+			objet.Interrupteur(position, (self.taille_case, self.taille_case))
 			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
 		if self.type_case == "pic":
 			objet.Pic(position, (self.taille_case, self.taille_case))
+		if self.type_case == "pic intervalle":
+			objet.PicIntervalle(position, (self.taille_case, self.taille_case))
+		if self.type_case == "pic interrupteur":
+			objet.PicInterrupteur(position, (self.taille_case, self.taille_case))
 			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
-			
+
 		self.niveau.coord["terrain"][pos_x][pos_y]["type"] = self.type_case
 
 	def supp_case(self, x, y):
@@ -173,7 +185,7 @@ class Editeur():
 
 		self.case_selection = [pos_x, pos_y]
 		self.widg_label_case.change_text(text=type_case)
-		self.widg_image_case.change_image(path="../image/"+type_case+".png")
+		self.widg_image_case.change_image(image=config.getImage(type_case))
 
 		''' On détruit tout les anciens widget de paramètre, dans le doute '''
 		if self.widg_button_cible:
@@ -190,6 +202,11 @@ class Editeur():
 			self.widg_label_param.change_text(text="- Interrupteur reliée à ({}) mécanisme(s).".format(nb_cible))
 			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
 			self.case_selection_cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
+		elif type_case == "pic interrupteur":
+			nb_cible = len(self.niveau.coord["terrain"][pos_x][pos_y]["cible"])
+			self.widg_label_param.change_text(text="- Pic reliée à ({}) mécanisme(s).".format(nb_cible))
+			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
+			self.case_selection_cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
 		else:
 			self.widg_label_param.change_text(text="Aucun(s) paramètre(s)")
 			self.case_selection_cible = []
@@ -200,7 +217,8 @@ class Editeur():
 		case_cible = self.niveau.coord["terrain"][pos_x][pos_y]
 
 		''' si la case ciblé est bien une cible potentielle ... '''
-		if case_cible["type"] == "interrupteur" or case_cible["type"] == "porte":
+		if case_cible["type"] in ["porte", "interrupteur", "pic interrupteur"]:
+			print(case_cible["type"])
 			if not [pos_x, pos_y] in self.case_selection_cible: # si la case selectionné ne l'est pas
 				self.case_selection_cible.append([pos_x, pos_y])
 
@@ -263,6 +281,16 @@ class Editeur():
 							list_cible.append(interrupteur)
 				porte.interrupteur = list_cible
 
+			for pic in objet.PicInterrupteur.liste:
+				list_cible = []
+				print(pic)
+				for (cible_x, cible_y) in pic.interrupteur:
+					position_cible = (cible_x*taille_case, cible_y*taille_case)
+					for interrupteur in objet.Interrupteur.liste:
+						if interrupteur.rect.topleft == position_cible:
+							list_cible.append(interrupteur)
+				pic.interrupteur = list_cible
+
 			for interrupteur in objet.Interrupteur.liste:
 				list_cible = []
 				for (cible_x, cible_y) in interrupteur.cible:
@@ -270,6 +298,9 @@ class Editeur():
 					for porte in objet.PorteInterrupteur.liste:
 						if porte.rect.topleft == position_cible:
 							list_cible.append(porte)
+					for pic in objet.PicInterrupteur.liste:
+						if pic.rect.topleft == position_cible:
+							list_cible.append(pic)
 				interrupteur.cible = list_cible
 
 			taille_perso = config.getConfig()["taille_personnage"]
@@ -282,6 +313,26 @@ class Editeur():
 			if self.perso:
 				self.perso.kill()
 				self.perso = None
+
+				taille_case = config.getConfig()["taille_case"]
+				for porte in objet.PorteInterrupteur.liste:
+					list_cible = []
+					for interr in porte.interrupteur:
+						(x, y) = interr.rect.topleft
+						list_cible.append((x/taille_case, y/taille_case))
+					porte.interrupteur = list_cible
+				for pic in objet.PicInterrupteur.liste:
+					list_cible = []
+					for interr in pic.interrupteur:
+						(x, y) = interr.rect.topleft
+						list_cible.append((x/taille_case, y/taille_case))
+					porte.interrupteur = list_cible
+				for interrupteur in objet.Interrupteur.liste:
+					list_cible = []
+					for cible in interrupteur.cible:
+						(x, y) = porte.rect.topleft
+						list_cible.append((x/taille_case, y/taille_case))
+					interrupteur.cible = list_cible
 
 		if mode == "selection cible":
 			self.widg_select_mode.change_text(text="Mode: selection (cible)")

@@ -15,6 +15,7 @@ class Objet(pygame.sprite.Sprite):
 		self.image = pygame.Surface(dimension)
 		self.rect = self.image.get_rect()
 		self.rect.topleft = position
+		self.size = dimension
 
 		self.hitbox = None
 
@@ -187,7 +188,7 @@ class Interrupteur(Objet):
 class PorteInterrupteur(Porte):
 	''' Porte qui s'ouvre à l'aide d'un interrupteur '''
 	liste = pygame.sprite.Group()
-	def __init__(self, position, dimension, interrupteur=None):
+	def __init__(self, position, dimension, interrupteur=[]):
 		super().__init__(position, dimension)
 		PorteInterrupteur.liste.add(self)
 
@@ -204,17 +205,114 @@ class PorteInterrupteur(Porte):
 					all_activated = False
 
 			if all_activated: # on regarde si ils sont tous activés et on ouvre la porte
+				if not self.statut:
+					self.image = config.getImage("sol")
+					self.image = pygame.transform.scale(self.image, self.size)
 				self.statut = True
 			else:
+				if self.statut:
+					self.image = config.getImage("porte")
+					self.image = pygame.transform.scale(self.image, self.size)
 				self.statut = False
 				
 		elif self.interrupteur:
-			if self.interrupteur: # si l'interrupteur est activé, on ouvre la porte
+			if self.interrupteur.statut: # si l'interrupteur est activé, on ouvre la porte
 				self.statut = True
 			else:
 				self.statut = False
 		
-# ===================================================== AUTRES ========================================================
+# ==================================================== PIEGES ===========================================================
+
+class Pic(Sol):
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension):
+		super().__init__(position, dimension)
+		Pic.liste.add(self)
+
+		self.image = config.getImage("pic")
+		self.image = pygame.transform.scale(self.image, dimension)
+		self.hitbox = self.rect.copy()
+
+		self.degat = 10
+
+	def action(self, cible):
+		''' Inflige des dégats aux cibles'''
+		if cible:
+			for objet in cible:
+				objet.degat(self.degat)
+
+class PicInterrupteur(Pic):
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension, interrupteur=[]):
+		super().__init__(position, dimension)
+		PicInterrupteur.liste.add(self)	
+
+		self.interrupteur = interrupteur
+
+	def action(self, cible=None):
+		''' Ouvre ou ferme les pics'''
+		if not cible:
+			print(self.interrupteur)
+			if type(self.interrupteur) == type([]): # Si on a plusieurs interrupteurs ....
+				all_activated = True
+				for interrupteur in self.interrupteur:
+					if not interrupteur.statut:
+						all_activated = False
+
+				if all_activated: # on regarde si ils sont tous activés et on ouvre la porte
+					if not self.hitbox:
+						self.image = config.getImage("sol")
+						self.image = pygame.transform.scale(self.image, self.size)
+					self.hitbox = None
+				else:
+					if self.hitbox:
+						self.image = config.getImage("pic interrupteur")
+						self.image = pygame.transform.scale(self.image, self.size)
+					self.hitbox = self.rect.copy()
+					
+			elif self.interrupteur:
+				if self.interrupteur.statut: # si l'interrupteur est activé, on ouvre la porte
+					self.image = config.getImage("sol")
+					self.image = pygame.transform.scale(self.image, self.size)
+					self.hitbox = None
+				else:
+					self.image = config.getImage("pic interrupteur")
+					self.image = pygame.transform.scale(self.image, self.size)
+					self.hitbox = self.rect.copy()
+
+		super().action(cible)
+
+class PicIntervalle(Pic):
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension):
+		super().__init__(position, dimension)
+		PicIntervalle.liste.add(self)
+
+		self.frame_activation = 200 # temps  de frame entre chaque état du pic
+		self._frame_time = self.frame_activation # timer
+
+	def update(self):
+		''' A chaque frame, on decroit le compteur si besoin '''
+		if self._frame_time:
+			self._frame_time -= 1
+
+		''' Quand timer à 0: On met à jour l'image et l'etat du pic '''
+		if not self._frame_time:
+			if self.hitbox:
+				self.image = config.getImage("sol")
+				self.image = pygame.transform.scale(self.image, self.size)
+				self.hitbox = None
+			else:
+				self.image = config.getImage("pic")
+				self.image = pygame.transform.scale(self.image, self.size)
+				self.hitbox = self.rect.copy()
+
+			self._frame_time = self.frame_activation
+
+
+		super().update()
+
+# ===================================================== AUTRES ==========================================================
 
 class SolSpawn(Sol):
 	liste = pygame.sprite.Group()
@@ -241,24 +339,6 @@ class Escalier(Sol):
 		''' Met fin au niveau'''
 		self.statut = True
 
-
-class Pic(Sol):
-	liste = pygame.sprite.Group()
-	def __init__(self, position, dimension):
-		super().__init__(position, dimension)
-		Pic.liste.add(self)
-
-		self.image = config.getImage("pic")
-		self.image = pygame.transform.scale(self.image, dimension)
-		self.hitbox = self.rect.copy()
-
-		self.degat = 10
-
-	def action(self, cible):
-		''' Inflige des dégats aux cibles'''
-		for objet in cible:
-			objet.degat(self.degat)
-		
 # ================================================== FONCTIONS GLOBALES ===============================================
 
 def update():

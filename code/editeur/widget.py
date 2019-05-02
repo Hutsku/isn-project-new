@@ -203,7 +203,7 @@ class Image(Widget):
 		if self.path: 
 			self.image = pygame.image.load(self.path).convert_alpha()
 			self.image = pygame.transform.scale(self.image, self.size)
-		else:
+		elif not self.image:
 			self.image = pygame.Surface(self.size).convert_alpha()
 			self.image.fill((0, 0, 0, 0))
 
@@ -225,11 +225,14 @@ class Image(Widget):
 		
 		self._build()
 
-	def change_image(self, path=None):
+	def change_image(self, path=None, image=None):
 		if not path:
 			path=self.path
+		if not image:
+			image=self.image
 
 		self.path = path
+		self.image = pygame.transform.scale(image, self.size)
 
 		self._build()
 

@@ -30,37 +30,7 @@ class Menu :
         self.widg_jouer.kill()
         self.widg_quitter.kill() 
  
-
-'''class Transition :
-    """ Simulation de l'interface du jeu """
-    def __init__(self, application) :
-        from itertools import cycle
-        couleurs = [(0, i, 0) for i in range(0, 255, 15)]
-        couleurs.extend(sorted(couleurs[1:-1], reverse=True))
-        self._couleurTexte = cycle(couleurs)
  
-        self._font = pygame.font.SysFont('arial', 40, bold=True, italic=False)
-        self.creerTexte()
-        self.rectTexte = self.texte.get_rect()
-        self.rectTexte.center = (surfaceW/2, surfaceH/2)
-
-        # Création d'un event
-        self._CLIGNOTER = pygame.USEREVENT + 1
-        pygame.time.set_timer(self._CLIGNOTER, 60)
- 
-    def creerTexte(self) :
-        self.texte = self._font.render('JEU EN COURS', True, next(self._couleurTexte))
- 
-    def update(self, events) :
-        self._fenetre.blit(self.texte, self.rectTexte)
-        for event in events :
-            if event.type == self._CLIGNOTER :
-                self.creerTexte()
- 
-    def detruire(self) :
-        pygame.time.set_timer(self._CLIGNOTER, 0) # désactivation du timer
-
-'''
 class Jeu:
     def __init__(self, application):
         taille_ecran = config["taille_ecran"]

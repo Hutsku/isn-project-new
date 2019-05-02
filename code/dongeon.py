@@ -45,6 +45,10 @@ class Dongeon ():
 					objet.Interrupteur(position, (taille_case, taille_case), cible=case["cible"])
 				if type_case == "pic":
 					objet.Pic(position, (taille_case, taille_case))
+				if type_case == "pic intervalle":
+					objet.PicIntervalle(position, (taille_case, taille_case))
+				if type_case == "pic interrupteur":
+					objet.PicInterrupteur(position, (taille_case, taille_case), interrupteur=case["cible"])
 				y += 1
 			x += 1
 

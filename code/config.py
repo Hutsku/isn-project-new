@@ -12,6 +12,8 @@ def init():
 		"spawn": pygame.image.load("../image/spawn.png").convert(),
 		"interrupteur": pygame.image.load("../image/interrupteur.png").convert(),
 		"pic": pygame.image.load("../image/pic.png").convert(),
+		"pic intervalle": pygame.image.load("../image/pic.png").convert(),
+		"pic interrupteur": pygame.image.load("../image/pic.png").convert(),
 	}
 
 def getConfig():
