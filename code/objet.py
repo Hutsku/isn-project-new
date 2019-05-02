@@ -166,8 +166,10 @@ class Interrupteur(Objet):
 	def __init__(self, position, dimension, cible=None):
 		super().__init__(position, dimension)
 		Interrupteur.liste.add(self)
+		self.dimension = dimension
+		self.statut = False
 
-		self.image = config.getImage("interrupteur")
+		self.image = config.getImage("interrupteur_off")
 		self.image = pygame.transform.scale(self.image, dimension)
 
 		self.cible = cible
@@ -181,8 +183,18 @@ class Interrupteur(Objet):
 		if type(self.cible) == type([]):
 			for cible in self.cible:
 				cible.action()
+				if self.statut:
+					self.image = config.getImage("interrupteur_on")
+					self.image = pygame.transform.scale(self.image, self.dimension)
+					self.statut = True
+				if self.statut == False:
+					self.image = config.getImage("interrupteur_off")
+					self.image = pygame.transform.scale(self.image, self.dimension)
+					self.statut = False
 		elif self.cible:
 			self.cible.action()
+			self.image = config.getImage("interrupteur_off")
+			self.image = pygame.transform.scale(self.image, self.dimension)
 
 
 class PorteInterrupteur(Porte):
