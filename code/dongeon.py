@@ -43,6 +43,8 @@ class Dongeon ():
 					objet.PorteInterrupteur(position, (taille_case, taille_case), interrupteur=case["cible"])
 				if type_case == "interrupteur":
 					objet.Interrupteur(position, (taille_case, taille_case), cible=case["cible"])
+				if type_case == "pic":
+					objet.Pic(position, (taille_case, taille_case))
 				y += 1
 			x += 1
 

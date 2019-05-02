@@ -95,6 +95,7 @@ class Editeur():
 		widget.ImageButton((50, 50), size=(30, 30), action=(self.change_type, "spawn"), path="../image/spawn.png", frame=frame3)
 		widget.ImageButton((130, 10), size=(30, 30), action=(self.change_type, "porte"), path="../image/porte.png", frame=frame3)
 		widget.ImageButton((130, 50), size=(30, 30), action=(self.change_type, "interrupteur"), path="../image/interrupteur.png", frame=frame3)
+		widget.ImageButton((90, 10), size=(30, 30), action=(self.change_type, "pic"), path="../image/pic.png", frame=frame3)
 
 		self.build_level()
 
@@ -147,7 +148,10 @@ class Editeur():
 		if self.type_case == "interrupteur":
 			objet.Interrupteur(position, (self.taille_case, self.taille_case), cible=None)
 			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
-
+		if self.type_case == "pic":
+			objet.Pic(position, (self.taille_case, self.taille_case))
+			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
+			
 		self.niveau.coord["terrain"][pos_x][pos_y]["type"] = self.type_case
 
 	def supp_case(self, x, y):

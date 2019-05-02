@@ -35,18 +35,21 @@ def dongeonEvent(app):
 # ========================================= BOUCLE PRINCIPALE ===========================================
 
 key_trad = {"a": 113, "z":119, "d":100, "q":97, "s":115} # traduction unicode et n° key
+pic = objet.Pic((200, 200), (100, 100))
 
 app = application.Application()
 app.start()
 clock = pygame.time.Clock()
+
 boucle = True
 while boucle:	 
-    clock.tick()
-    pygame.display.set_caption( str(clock.get_fps()))
+    clock.tick(120)
+    pygame.display.set_caption(str(clock.get_fps()))
     if application.check_statut_quitter(app):
         boucle = False
 
-    elif application.check_statut_menu(app):
+    ''' Boucle du menu '''
+    if application.check_statut_menu(app):
         fond.fill((0, 0, 0))
         fenetre.blit(fond, (0, 0)) # on colle le fond
         for event in pygame.event.get():
@@ -57,14 +60,10 @@ while boucle:
         widget.update()
         pygame.display.flip() # raffraichissement de la fenêtre
 
-    elif application.check_statut_transition(app):
-        pass
-
-    elif application.check_statut_jeu(app):
+    ''' Boucle in game '''
+    if application.check_statut_jeu(app):
         fond.fill((100, 100, 100))
         perso = application.get_perso(app)
-        #perso.vx = 0 #initialisation de la vitesse axe X personnage a 0
-        #perso.vy = 0 #initialisation de la vitesse axe Y personnage a 0
         fenetre.blit(fond, (0, 0)) # on colle le fond
 
         # on gère les evenements claviers et souris 
@@ -92,12 +91,12 @@ while boucle:
                 if key_trad["z"] == event.key or key_trad["s"] == event.key:
                     perso.vy = 0
 
-        widget.update()
         objetEvent() # Evenements relatifs aux objets
         dongeonEvent(app) # Evenements relatifs au niveau en général
         #hudEvent() # Evenements relatifs à l'interface
+        widget.update()
 
-        pygame.display.flip() # raffraichissement de la fenêtre
+        pygame.display.update() # raffraichissement de la fenêtre
 
 # ================================================================================================
 # '''

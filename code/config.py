@@ -5,16 +5,17 @@ dic_image = {}
 def init():
 	global dic_image
 	dic_image = {
-		"mur": pygame.image.load("../image/mur.png").convert_alpha(),
-		"sol": pygame.image.load("../image/sol.png").convert_alpha(),
-		"escalier": pygame.image.load("../image/fin.png").convert_alpha(),
-		"porte": pygame.image.load("../image/porte.png").convert_alpha(),
-		"spawn": pygame.image.load("../image/spawn.png").convert_alpha(),
-		"interrupteur": pygame.image.load("../image/interrupteur.png").convert_alpha(),
+		"mur": pygame.image.load("../image/mur.png").convert(),
+		"sol": pygame.image.load("../image/sol.png").convert(),
+		"escalier": pygame.image.load("../image/fin.png").convert(),
+		"porte": pygame.image.load("../image/porte.png").convert(),
+		"spawn": pygame.image.load("../image/spawn.png").convert(),
+		"interrupteur": pygame.image.load("../image/interrupteur.png").convert(),
+		"pic": pygame.image.load("../image/pic.png").convert(),
 	}
 
 def getConfig():
-	taille_level = 600 #taille de l'espace de jeu
+	taille_level = 800 #taille de l'espace de jeu
 	nb_case = 20 #nombre de case de jeu
 	taille_HUD = round((20*taille_level)/100) #definie la taille de l'hud (auto)
 	taille_editeur = taille_level + 300

@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 
 import config
+import editeur.widget as widget
 		
 # ======================================================== CLASSE MERE ==================================================
 
@@ -38,6 +39,10 @@ class Character(Objet):
 		self.vx = 0
 		self.vy = 0
 
+		self.hitbox = self.rect
+		self.frame_invincibilite = 75 # nb de frame avant qu'une autre attaque puisse le toucher
+		self._frame_time = 0 # False si le timer est reset, sinon ce sera le nb de frame qu'il reste 
+
 	def move(self, coord=None):
 		''' Actualise la position de l'objet, selon ses vecteurs de vitesse '''
 		if coord:
@@ -70,6 +75,18 @@ class Character(Objet):
 		''' Interagit avec une cible '''
 		hitbox(groupe=Interrupteur.liste) # Interaction avec les interrupteurs
 
+	def update(self):
+		''' A chaque frame, on decroit le compteur si besoin '''
+		if self._frame_time:
+			self._frame_time -= 1
+
+		super().update()
+
+	def degat(self, valeur):
+		if not self._frame_time:
+			print("DEGAT !")
+			self._frame_time = self.frame_invincibilite # on initialise le compteur
+
 
 class Personnage(Character):
 	liste = pygame.sprite.Group()
@@ -77,8 +94,24 @@ class Personnage(Character):
 		super().__init__(position, dimension)
 		Personnage.liste.add(self)
 
-		self.speed = 1
+		self.speed = 3
 		self.image.fill((255, 0, 0))
+
+		self._notif = None
+
+	def update(self):
+		if self._notif:
+			self._notif.rect.center = (self.rect.centerx, self.rect.y-20)
+
+		super().update() # on appelle update() de Widget
+
+	def notif(self, text):
+		self._notif = widget.Label(self.rect.topleft, size=(200, 20), text=text, color=[0, 0, 0, 0], centered=True, bold=True)
+		self._notif.rect.center = (self.rect.centerx, self.rect.y-20)
+
+	def supp_notif(self):
+		self._notif.kill()
+		self._notif = None
 
 	def gauche(self):
 		self.vx = -1
@@ -102,6 +135,7 @@ class Mur(Objet):
 
 		self.image = config.getImage("mur")
 		self.image = pygame.transform.scale(self.image, dimension)
+
 
 class Sol(Objet):
 	liste = pygame.sprite.Group()
@@ -180,7 +214,6 @@ class PorteInterrupteur(Porte):
 			else:
 				self.statut = False
 		
-
 # ===================================================== AUTRES ========================================================
 
 class SolSpawn(Sol):
@@ -193,9 +226,7 @@ class SolSpawn(Sol):
 
 
 class Escalier(Sol):
-
 	liste = pygame.sprite.Group()
-	
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
 		Escalier.liste.add(self)
@@ -209,6 +240,24 @@ class Escalier(Sol):
 	def action(self, cible):
 		''' Met fin au niveau'''
 		self.statut = True
+
+
+class Pic(Sol):
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension):
+		super().__init__(position, dimension)
+		Pic.liste.add(self)
+
+		self.image = config.getImage("pic")
+		self.image = pygame.transform.scale(self.image, dimension)
+		self.hitbox = self.rect.copy()
+
+		self.degat = 10
+
+	def action(self, cible):
+		''' Inflige des dégats aux cibles'''
+		for objet in cible:
+			objet.degat(self.degat)
 		
 # ================================================== FONCTIONS GLOBALES ===============================================
 
@@ -234,11 +283,9 @@ def move():
 	for objet in Character.liste:
 		objet.move()
 
-def hitbox(groupe=None):
+def hitbox(groupe=Sol.liste):
 	''' On check si les hitbox des sprites interragissent avec certains objets 
 		Hitbox d'attaque, projectile, pic au sol, etc. '''
-	if not groupe:
-		groupe = Sol.liste # par défaut on vérifie les hitbox au sol type pic etc.
 
 	for objet in groupe:
 		if objet.hitbox: # si l'objet a une hitbox active ...
@@ -248,6 +295,14 @@ def hitbox(groupe=None):
 					liste_collide.remove(objet) # on enlève l'objet lui même de la liste des sprite touchés ...
 				if liste_collide:
 					objet.action(liste_collide) # on appel la fonction d'action de l'objet, avec les cibles en arguments
+
+	for perso in Personnage.liste:
+		''' Si il est bien sur un interrupteur et qu'il n'y a pas de notif ...'''
+		if collide(perso.hitbox, groupe=Interrupteur.liste):
+			if not perso._notif: 
+				perso.notif("(A) Interragir")
+		elif perso._notif: # Si il y a deja une notif mais que le perso n'est plus dessus, on supprime
+			perso.supp_notif()
 
 def collide(rect, groupe=Objet.liste):
 	''' Renvoit la liste des objets touchés par le rect '''

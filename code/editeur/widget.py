@@ -43,8 +43,6 @@ class Widget(pygame.sprite.Sprite):
 
 	def update(self):
 		''' Met à jour l'affichage du Widget '''
-		#print(self.rect.topleft)
-		self.rect = self.image.get_rect(topleft=self.rect.topleft)
 		if self.frame:
 			self.frame.image.blit(self.image, self.rect)
 		else:
@@ -61,7 +59,7 @@ class Widget(pygame.sprite.Sprite):
 	def resize(self, size):
 		self.image = pygame.transform.scale(self.image, size)
 		self.size = size
-		self.rect = self.image.get_rect(center=self.rect.topleft)
+		self.rect = self.image.get_rect(topleft=self.rect.topleft)
 
 
 class Label(Widget):
