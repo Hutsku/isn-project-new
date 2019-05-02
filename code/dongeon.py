@@ -55,13 +55,22 @@ class Dongeon ():
 		''' On va rechercher et ajouter les cible à leur mecanisme (l'objet lui-même, pas les coordonnées) '''
 		for porte in objet.PorteInterrupteur.liste:
 			list_cible = []
-			print(porte.interrupteur)
 			for (cible_x, cible_y) in porte.interrupteur:
 				position_cible = (cible_x*taille_case, cible_y*taille_case)
 				for interrupteur in objet.Interrupteur.liste:
 					if interrupteur.rect.topleft == position_cible:
 						list_cible.append(interrupteur)
 			porte.interrupteur = list_cible
+
+		for pic in objet.PicInterrupteur.liste:
+			list_cible = []
+			print(pic)
+			for (cible_x, cible_y) in pic.interrupteur:
+				position_cible = (cible_x*taille_case, cible_y*taille_case)
+				for interrupteur in objet.Interrupteur.liste:
+					if interrupteur.rect.topleft == position_cible:
+						list_cible.append(interrupteur)
+			pic.interrupteur = list_cible
 
 		for interrupteur in objet.Interrupteur.liste:
 			list_cible = []
@@ -70,6 +79,9 @@ class Dongeon ():
 				for porte in objet.PorteInterrupteur.liste:
 					if porte.rect.topleft == position_cible:
 						list_cible.append(porte)
+				for pic in objet.PicInterrupteur.liste:
+					if pic.rect.topleft == position_cible:
+						list_cible.append(pic)
 			interrupteur.cible = list_cible
 
 		''' On spawn le perso au bon endroit '''

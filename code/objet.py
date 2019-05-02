@@ -260,14 +260,12 @@ class PicInterrupteur(Pic):
 						all_activated = False
 
 				if all_activated: # on regarde si ils sont tous activés et on ouvre la porte
-					if not self.hitbox:
-						self.image = config.getImage("sol")
-						self.image = pygame.transform.scale(self.image, self.size)
+					self.image = config.getImage("sol")
+					self.image = pygame.transform.scale(self.image, self.size)
 					self.hitbox = None
 				else:
-					if self.hitbox:
-						self.image = config.getImage("pic interrupteur")
-						self.image = pygame.transform.scale(self.image, self.size)
+					self.image = config.getImage("pic interrupteur")
+					self.image = pygame.transform.scale(self.image, self.size)
 					self.hitbox = self.rect.copy()
 					
 			elif self.interrupteur:
