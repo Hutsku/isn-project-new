@@ -169,7 +169,7 @@ class Interrupteur(Objet):
 		self.dimension = dimension
 		self.statut = False
 
-		self.image = config.getImage("interrupteur_off")
+		self.image = config.getImage("interrupteur")
 		self.image = pygame.transform.scale(self.image, dimension)
 
 		self.cible = cible
@@ -184,16 +184,16 @@ class Interrupteur(Objet):
 			for cible in self.cible:
 				cible.action()
 				if self.statut:
-					self.image = config.getImage("interrupteur_on")
+					self.image = config.getImage("interrupteur on")
 					self.image = pygame.transform.scale(self.image, self.dimension)
 					self.statut = True
 				if self.statut == False:
-					self.image = config.getImage("interrupteur_off")
+					self.image = config.getImage("interrupteur")
 					self.image = pygame.transform.scale(self.image, self.dimension)
 					self.statut = False
 		elif self.cible:
 			self.cible.action()
-			self.image = config.getImage("interrupteur_off")
+			self.image = config.getImage("interrupteur")
 			self.image = pygame.transform.scale(self.image, self.dimension)
 
 
@@ -241,7 +241,7 @@ class Pic(Sol):
 		super().__init__(position, dimension)
 		Pic.liste.add(self)
 
-		self.image = config.getImage("pic_on")
+		self.image = config.getImage("pic")
 		self.image = pygame.transform.scale(self.image, dimension)
 		self.hitbox = self.rect.copy()
 
@@ -311,11 +311,11 @@ class PicIntervalle(Pic):
 		''' Quand timer à 0: On met à jour l'image et l'etat du pic '''
 		if not self._frame_time:
 			if self.hitbox:
-				self.image = config.getImage("pic_off")
+				self.image = config.getImage("pic off")
 				self.image = pygame.transform.scale(self.image, self.size)
 				self.hitbox = None
 			else:
-				self.image = config.getImage("pic_on")
+				self.image = config.getImage("pic")
 				self.image = pygame.transform.scale(self.image, self.size)
 				self.hitbox = self.rect.copy()
 
