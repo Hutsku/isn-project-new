@@ -96,9 +96,9 @@ class Editeur():
 		widget.ImageButton((130, 10), size=(30, 30), action=(self.change_type, "porte"), path="../image/porte.png", frame=frame3)
 		widget.ImageButton((130, 50), size=(30, 30), action=(self.change_type, "interrupteur"), path="../image/interrupteur_off.png", frame=frame3)
 		widget.ImageButton((130, 90), size=(30, 30), action=(self.change_type, "interrupteur timer"), path="../image/interrupteur_off.png", frame=frame3)
-		widget.ImageButton((90, 10), size=(30, 30), action=(self.change_type, "pic"), path="../image/pic.png", frame=frame3)
-		widget.ImageButton((90, 50), size=(30, 30), action=(self.change_type, "pic intervalle"), path="../image/pic.png", frame=frame3)
-		widget.ImageButton((90, 90), size=(30, 30), action=(self.change_type, "pic interrupteur"), path="../image/pic.png", frame=frame3)
+		widget.ImageButton((90, 10), size=(30, 30), action=(self.change_type, "pic"), path="../image/pic_on.png", frame=frame3)
+		widget.ImageButton((90, 50), size=(30, 30), action=(self.change_type, "pic intervalle"), path="../image/pic_on.png", frame=frame3)
+		widget.ImageButton((90, 90), size=(30, 30), action=(self.change_type, "pic interrupteur"), path="../image/pic_on.png", frame=frame3)
 
 		self.build_level()
 
@@ -123,7 +123,7 @@ class Editeur():
 				if type_case == "interrupteur":
 					objet.Interrupteur(position, (self.taille_case, self.taille_case), cible=case["cible"])
 				if type_case == "interrupteur timer":
-					objet.Interrupteur(position, (self.taille_case, self.taille_case), cible=case["cible"])
+					objet.InterrupteurTimer(position, (self.taille_case, self.taille_case), cible=case["cible"])
 				if type_case == "pic":
 					objet.Pic(position, (self.taille_case, self.taille_case))
 				if type_case == "pic intervalle":

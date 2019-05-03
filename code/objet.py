@@ -196,6 +196,52 @@ class Interrupteur(Objet):
 			self.image = config.getImage("interrupteur")
 			self.image = pygame.transform.scale(self.image, self.dimension)
 
+class InterrupteurTimer(Interrupteur):
+	''' Interrupteur permettant d'activer un mecanisme / porte '''
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension, cible=[]):
+		super().__init__(position, dimension, cible=cible)
+		InterrupteurTimer.liste.add(self)
+
+		self.frame_activation = 500 # nb de frame de l'activation
+		self._frame_time = 0 # timer
+
+	def update(self):
+		''' A chaque frame, on decroit le compteur si besoin '''
+		if self._frame_time:
+			self._frame_time -= 1
+		elif self.statut:
+			self.action()
+
+		super().update()
+
+	def action(self, cible=None):
+		self.statut = not self.statut
+
+		if type(self.cible) == type([]):
+			for cible in self.cible:
+				cible.action()
+				if self.statut:
+					self.image = config.getImage("interrupteur on")
+					self.image = pygame.transform.scale(self.image, self.dimension)
+					self.statut = True
+					self._frame_time = self.frame_activation # On active le timer
+				if not self.statut:
+					self.image = config.getImage("interrupteur")
+					self.image = pygame.transform.scale(self.image, self.dimension)
+					self.statut = False
+					self._frame_time = 0
+		elif self.cible:
+			if self.statut:
+				self.image = config.getImage("interrupteur on")
+				self.image = pygame.transform.scale(self.image, self.dimension)
+				self.statut = True
+				self._frame_time = self.frame_activation # On active le timer
+			if not self.statut:
+				self.image = config.getImage("interrupteur")
+				self.image = pygame.transform.scale(self.image, self.dimension)
+				self.statut = False
+				self._frame_time = 0
 
 class PorteInterrupteur(Porte):
 	''' Porte qui s'ouvre à l'aide d'un interrupteur '''
@@ -264,7 +310,7 @@ class PicInterrupteur(Pic):
 	def action(self, cible=None):
 		''' Ouvre ou ferme les pics'''
 		if not cible:
-			print(self.interrupteur)
+			print("interr")
 			if type(self.interrupteur) == type([]): # Si on a plusieurs interrupteurs ....
 				all_activated = True
 				for interrupteur in self.interrupteur:
@@ -272,23 +318,21 @@ class PicInterrupteur(Pic):
 						all_activated = False
 
 				if all_activated: # on regarde si ils sont tous activés et on ouvre la porte
-					if not self.hitbox:
-						self.image = config.getImage("sol")
-						self.image = pygame.transform.scale(self.image, self.size)
+					self.image = config.getImage("pic off")
+					self.image = pygame.transform.scale(self.image, self.size)
 					self.hitbox = None
 				else:
-					if self.hitbox:
-						self.image = config.getImage("pic interrupteur")
-						self.image = pygame.transform.scale(self.image, self.size)
+					self.image = config.getImage("pic")
+					self.image = pygame.transform.scale(self.image, self.size)
 					self.hitbox = self.rect.copy()
 					
 			elif self.interrupteur:
 				if self.interrupteur.statut: # si l'interrupteur est activé, on ouvre la porte
-					self.image = config.getImage("sol")
+					self.image = config.getImage("pic off")
 					self.image = pygame.transform.scale(self.image, self.size)
 					self.hitbox = None
 				else:
-					self.image = config.getImage("pic interrupteur")
+					self.image = config.getImage("pic")
 					self.image = pygame.transform.scale(self.image, self.size)
 					self.hitbox = self.rect.copy()
 

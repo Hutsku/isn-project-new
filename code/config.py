@@ -14,9 +14,9 @@ def init():
 		"interrupteur timer": pygame.image.load("../image/interrupteur_off.png").convert(),
 		"interrupteur on": pygame.image.load("../image/interrupteur_on.png").convert(),
 		"pic": pygame.image.load("../image/pic_on.png").convert(),
-		"pic off": pygame.image.load("../image/pic_off.png").convert(),
 		"pic intervalle": pygame.image.load("../image/pic_on.png").convert(),
 		"pic interrupteur": pygame.image.load("../image/pic_on.png").convert(),
+		"pic off": pygame.image.load("../image/pic_off.png").convert(),
 	}
 
 def getConfig():
