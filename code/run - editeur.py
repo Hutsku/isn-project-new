@@ -94,8 +94,7 @@ class Editeur():
 		widget.ImageButton((50, 10), size=(30, 30), action=(self.change_type, "fin"), path="../image/fin.png", frame=frame3)
 		widget.ImageButton((50, 50), size=(30, 30), action=(self.change_type, "spawn"), path="../image/spawn.png", frame=frame3)
 		widget.ImageButton((130, 10), size=(30, 30), action=(self.change_type, "porte"), path="../image/porte.png", frame=frame3)
-		widget.ImageButton((130, 50), size=(30, 30), action=(self.change_type, "interrupteur"), path="../image/interrupteur_off.png", frame=frame3)
-		widget.ImageButton((130, 90), size=(30, 30), action=(self.change_type, "interrupteur timer"), path="../image/interrupteur_off.png", frame=frame3)
+		widget.ImageButton((130, 50), size=(30, 30), action=(self.change_type, "interrupteur"), path="../image/interrupteur.png", frame=frame3)
 		widget.ImageButton((90, 10), size=(30, 30), action=(self.change_type, "pic"), path="../image/pic.png", frame=frame3)
 		widget.ImageButton((90, 50), size=(30, 30), action=(self.change_type, "pic intervalle"), path="../image/pic.png", frame=frame3)
 		widget.ImageButton((90, 90), size=(30, 30), action=(self.change_type, "pic interrupteur"), path="../image/pic.png", frame=frame3)
@@ -122,8 +121,6 @@ class Editeur():
 					objet.PorteInterrupteur(position, (self.taille_case, self.taille_case), interrupteur=case["cible"])
 				if type_case == "interrupteur":
 					objet.Interrupteur(position, (self.taille_case, self.taille_case), cible=case["cible"])
-				if type_case == "interrupteur timer":
-					objet.InterrupteurTimer(position, (self.taille_case, self.taille_case), cible=case["cible"])
 				if type_case == "pic":
 					objet.Pic(position, (self.taille_case, self.taille_case))
 				if type_case == "pic intervalle":
@@ -158,9 +155,6 @@ class Editeur():
 			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
 		if self.type_case == "interrupteur":
 			objet.Interrupteur(position, (self.taille_case, self.taille_case))
-			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
-		if self.type_case == "interrupteur timer":
-			objet.InterrupteurTimer(position, (self.taille_case, self.taille_case))
 			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
 		if self.type_case == "pic":
 			objet.Pic(position, (self.taille_case, self.taille_case))
@@ -203,7 +197,7 @@ class Editeur():
 			self.widg_label_param.change_text(text="- Porte reliée à ({}) mécanisme(s).".format(nb_cible))
 			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
 			self.case_selection_cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
-		elif type_case in ["interrupteur", "interrupteur timer"]:
+		elif type_case == "interrupteur":
 			nb_cible = len(self.niveau.coord["terrain"][pos_x][pos_y]["cible"])
 			self.widg_label_param.change_text(text="- Interrupteur reliée à ({}) mécanisme(s).".format(nb_cible))
 			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
@@ -223,7 +217,8 @@ class Editeur():
 		case_cible = self.niveau.coord["terrain"][pos_x][pos_y]
 
 		''' si la case ciblé est bien une cible potentielle ... '''
-		if case_cible["type"] in ["porte", "interrupteur", "interrupteur timer", "pic interrupteur"]:
+		if case_cible["type"] in ["porte", "interrupteur", "pic interrupteur"]:
+			print(case_cible["type"])
 			if not [pos_x, pos_y] in self.case_selection_cible: # si la case selectionné ne l'est pas
 				self.case_selection_cible.append([pos_x, pos_y])
 
