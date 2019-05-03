@@ -94,10 +94,10 @@ class Editeur():
 		widget.ImageButton((50, 10), size=(30, 30), action=(self.change_type, "fin"), path="../image/fin.png", frame=frame3)
 		widget.ImageButton((50, 50), size=(30, 30), action=(self.change_type, "spawn"), path="../image/spawn.png", frame=frame3)
 		widget.ImageButton((130, 10), size=(30, 30), action=(self.change_type, "porte"), path="../image/porte.png", frame=frame3)
-		widget.ImageButton((130, 50), size=(30, 30), action=(self.change_type, "interrupteur"), path="../image/interrupteur.png", frame=frame3)
-		widget.ImageButton((90, 10), size=(30, 30), action=(self.change_type, "pic"), path="../image/pic.png", frame=frame3)
-		widget.ImageButton((90, 50), size=(30, 30), action=(self.change_type, "pic intervalle"), path="../image/pic.png", frame=frame3)
-		widget.ImageButton((90, 90), size=(30, 30), action=(self.change_type, "pic interrupteur"), path="../image/pic.png", frame=frame3)
+		widget.ImageButton((130, 50), size=(30, 30), action=(self.change_type, "interrupteur"), path="../image/interrupteur off.png", frame=frame3)
+		widget.ImageButton((90, 10), size=(30, 30), action=(self.change_type, "pic"), path="../image/pic off.png", frame=frame3)
+		widget.ImageButton((90, 50), size=(30, 30), action=(self.change_type, "pic intervalle"), path="../image/pic off.png", frame=frame3)
+		widget.ImageButton((90, 90), size=(30, 30), action=(self.change_type, "pic interrupteur"), path="../image/pic off.png", frame=frame3)
 
 		self.build_level()
 

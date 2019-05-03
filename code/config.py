@@ -10,12 +10,12 @@ def init():
 		"escalier": pygame.image.load("../image/fin.png").convert(),
 		"porte": pygame.image.load("../image/porte.png").convert(),
 		"spawn": pygame.image.load("../image/spawn.png").convert(),
-		"interrupteur_on": pygame.image.load("../image/interrupteur_on.png").convert(),
-		"interrupteur_off": pygame.image.load("../image/interrupteur_off.png").convert(),
-		"pic_on": pygame.image.load("../image/pic_on.png").convert(),
-		"pic_off": pygame.image.load("../image/pic_off.png").convert(),
-		"pic intervalle": pygame.image.load("../image/pic_on.png").convert(),
-		"pic interrupteur": pygame.image.load("../image/pic_on.png").convert(),
+		"interrupteur_on": pygame.image.load("../image/interrupteur on.png").convert(),
+		"interrupteur_off": pygame.image.load("../image/interrupteur off.png").convert(),
+		"pic_on": pygame.image.load("../image/pic on.png").convert(),
+		"pic_off": pygame.image.load("../image/pic off.png").convert(),
+		"pic intervalle": pygame.image.load("../image/pic on.png").convert(),
+		"pic interrupteur": pygame.image.load("../image/pic on.png").convert(),
 	}
 
 def getConfig():
