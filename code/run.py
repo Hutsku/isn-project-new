@@ -43,7 +43,7 @@ clock = pygame.time.Clock()
 
 boucle = True
 while boucle:	 
-    clock.tick()
+    clock.tick(120)
     pygame.display.set_caption(str(clock.get_fps()))
     if application.check_statut_quitter(app):
         boucle = False

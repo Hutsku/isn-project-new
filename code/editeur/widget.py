@@ -73,7 +73,7 @@ class Label(Widget):
 		self.bold = bold
 		self.text_color = text_color
 		self._sys_font = pygame.font.SysFont(self.font, self.police, bold=self.bold, italic=False)
-		self._obj_text = self._sys_font.render(self.text, False, self.text_color)
+		self._obj_text = self._sys_font.render(self.text, True, self.text_color)
 
 		self.border = border
 		self.border_color = border_color
@@ -136,7 +136,7 @@ class Label(Widget):
 		if text != self.text or color != self.color:
 			self.text = text
 			self.text_color = color
-			self._obj_text = self._sys_font.render(self.text, False, self.text_color)
+			self._obj_text = self._sys_font.render(self.text, True, self.text_color)
 
 		self._build()
 
