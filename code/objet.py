@@ -310,7 +310,6 @@ class PicInterrupteur(Pic):
 	def action(self, cible=None):
 		''' Ouvre ou ferme les pics'''
 		if not cible:
-			print("interr")
 			if type(self.interrupteur) == type([]): # Si on a plusieurs interrupteurs ....
 				all_activated = True
 				for interrupteur in self.interrupteur:
