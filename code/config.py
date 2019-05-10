@@ -6,6 +6,8 @@ def init():
 	global dic_image
 	dic_image = {
 		"mur": pygame.image.load("../image/mur.png").convert(),
+		"eau": pygame.image.load("../image/eau.png").convert(),
+		"vide": pygame.image.load("../image/vide.png").convert(),
 		"sol": pygame.image.load("../image/sol.png").convert(),
 		"fin": pygame.image.load("../image/fin.png").convert(),
 		"porte": pygame.image.load("../image/porte.png").convert(),
@@ -17,6 +19,7 @@ def init():
 		"pic intervalle": pygame.image.load("../image/pic_on.png").convert(),
 		"pic interrupteur": pygame.image.load("../image/pic_on.png").convert(),
 		"pic off": pygame.image.load("../image/pic_off.png").convert(),
+		"lave": pygame.image.load("../image/lave.png").convert(),
 	}
 
 def getConfig():

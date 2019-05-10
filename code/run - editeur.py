@@ -89,16 +89,19 @@ class Editeur():
 		self.widg_select_mode = widget.Label((120, 240), size=(150, 30), text="Mode: selection", text_color=(0, 0, 255), color=(100, 100, 100), frame=frame2)
 
 		''' FRAME 3 - Type de case à ajouter '''
-		widget.ImageButton((10, 10), size=(30, 30), action=(self.change_type, "mur"), path="../image/mur.png", frame=frame3)
-		widget.ImageButton((10, 50), size=(30, 30), action=(self.change_type, "sol"), path="../image/sol.png", frame=frame3)
-		widget.ImageButton((50, 10), size=(30, 30), action=(self.change_type, "fin"), path="../image/fin.png", frame=frame3)
-		widget.ImageButton((50, 50), size=(30, 30), action=(self.change_type, "spawn"), path="../image/spawn.png", frame=frame3)
-		widget.ImageButton((130, 10), size=(30, 30), action=(self.change_type, "porte"), path="../image/porte.png", frame=frame3)
-		widget.ImageButton((130, 50), size=(30, 30), action=(self.change_type, "interrupteur"), path="../image/interrupteur_off.png", frame=frame3)
-		widget.ImageButton((130, 90), size=(30, 30), action=(self.change_type, "interrupteur timer"), path="../image/interrupteur_off.png", frame=frame3)
-		widget.ImageButton((90, 10), size=(30, 30), action=(self.change_type, "pic"), path="../image/pic_on.png", frame=frame3)
-		widget.ImageButton((90, 50), size=(30, 30), action=(self.change_type, "pic intervalle"), path="../image/pic_on.png", frame=frame3)
-		widget.ImageButton((90, 90), size=(30, 30), action=(self.change_type, "pic interrupteur"), path="../image/pic_on.png", frame=frame3)
+		widget.ImageButton((10, 10), size=(30, 30), action=(self.change_type, "sol"), path="../image/sol.png", frame=frame3)
+		widget.ImageButton((10, 50), size=(30, 30), action=(self.change_type, "fin"), path="../image/fin.png", frame=frame3)
+		widget.ImageButton((10, 90), size=(30, 30), action=(self.change_type, "spawn"), path="../image/spawn.png", frame=frame3)
+		widget.ImageButton((50, 10), size=(30, 30), action=(self.change_type, "mur"), path="../image/mur.png", frame=frame3)
+		widget.ImageButton((50, 50), size=(30, 30), action=(self.change_type, "eau"), path="../image/eau.png", frame=frame3)
+		widget.ImageButton((50, 90), size=(30, 30), action=(self.change_type, "vide"), path="../image/vide.png", frame=frame3)
+		widget.ImageButton((90, 10), size=(30, 30), action=(self.change_type, "lave"), path="../image/lave.png", frame=frame3)
+		widget.ImageButton((130, 10), size=(30, 30), action=(self.change_type, "pic"), path="../image/pic_on.png", frame=frame3)
+		widget.ImageButton((130, 50), size=(30, 30), action=(self.change_type, "pic intervalle"), path="../image/pic_on.png", frame=frame3)
+		widget.ImageButton((130, 90), size=(30, 30), action=(self.change_type, "pic interrupteur"), path="../image/pic_on.png", frame=frame3)
+		widget.ImageButton((170, 10), size=(30, 30), action=(self.change_type, "porte"), path="../image/porte.png", frame=frame3)
+		widget.ImageButton((170, 50), size=(30, 30), action=(self.change_type, "interrupteur"), path="../image/interrupteur_off.png", frame=frame3)
+		widget.ImageButton((170, 90), size=(30, 30), action=(self.change_type, "interrupteur timer"), path="../image/interrupteur_off.png", frame=frame3)
 
 		self.build_level()
 
@@ -112,6 +115,10 @@ class Editeur():
 				type_case = case["type"]
 				if type_case == "mur":
 					objet.Mur(position, (self.taille_case, self.taille_case))
+				if type_case == "eau":
+					objet.Eau(position, (self.taille_case, self.taille_case))
+				if type_case == "vide":
+					objet.Vide(position, (self.taille_case, self.taille_case))
 				if type_case == "sol":
 					objet.Sol(position, (self.taille_case, self.taille_case))
 				if type_case == "fin":
@@ -124,6 +131,8 @@ class Editeur():
 					objet.Interrupteur(position, (self.taille_case, self.taille_case), cible=case["cible"])
 				if type_case == "interrupteur timer":
 					objet.InterrupteurTimer(position, (self.taille_case, self.taille_case), cible=case["cible"])
+				if type_case == "lave":
+					objet.Lave(position, (self.taille_case, self.taille_case))
 				if type_case == "pic":
 					objet.Pic(position, (self.taille_case, self.taille_case))
 				if type_case == "pic intervalle":
@@ -144,41 +153,47 @@ class Editeur():
 		pos_y = math.floor(y/self.taille_case)
 		position = (pos_x*self.taille_case, pos_y*self.taille_case)
 
-		self.supp_case(x, y)
+		print(self.type_case)
+		self.supp_case(x, y, replace=True)
 		if self.type_case == "mur":
 			objet.Mur(position, (self.taille_case, self.taille_case))
-		if self.type_case == "sol":
+		elif self.type_case == "eau":
+			objet.Eau(position, (self.taille_case, self.taille_case))
+		elif self.type_case == "vide":
+			objet.Vide(position, (self.taille_case, self.taille_case))
+		elif self.type_case == "sol":
 			objet.Sol(position, (self.taille_case, self.taille_case))
-		if self.type_case == "spawn":
+		elif self.type_case == "spawn":
 			self.niveau.spawn = (pos_x, pos_y)
 			objet.SolSpawn(position, (self.taille_case, self.taille_case)) # une simple case Sol rouge
-		if self.type_case == "fin":
+		elif self.type_case == "fin":
 			objet.Escalier(position, (self.taille_case, self.taille_case))
-		if self.type_case == "porte":
+		elif self.type_case == "porte":
 			objet.PorteInterrupteur(position, (self.taille_case, self.taille_case))
 			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
-		if self.type_case == "interrupteur":
+		elif self.type_case == "interrupteur":
 			objet.Interrupteur(position, (self.taille_case, self.taille_case))
 			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
-		if self.type_case == "interrupteur timer":
+		elif self.type_case == "interrupteur timer":
 			objet.InterrupteurTimer(position, (self.taille_case, self.taille_case))
 			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
-		if self.type_case == "pic":
+		elif self.type_case == "lave":
+			objet.Lave(position, (self.taille_case, self.taille_case))
+		elif self.type_case == "pic":
 			objet.Pic(position, (self.taille_case, self.taille_case))
-		if self.type_case == "pic intervalle":
+		elif self.type_case == "pic intervalle":
 			objet.PicIntervalle(position, (self.taille_case, self.taille_case))
-		if self.type_case == "pic interrupteur":
+		elif self.type_case == "pic interrupteur":
 			objet.PicInterrupteur(position, (self.taille_case, self.taille_case))
 			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
+		else:
+			print("type invalide: "+self.type_case)
 
-		self.niveau.coord["terrain"][pos_x][pos_y]["type"] = self.type_case
-
-	def supp_case(self, x, y):
+	def supp_case(self, x, y, replace=False):
 		''' Remplace la case du niveau par du sol '''
 		pos_x = math.floor(x/self.taille_case)
 		pos_y = math.floor(y/self.taille_case)
 		position = (pos_x*self.taille_case, pos_y*self.taille_case)
-		self.niveau.coord["terrain"][pos_x][pos_y]["type"] = "sol"
 
 		_objet = pygame.sprite.Sprite() # on crée un point correspondant au clique de la souris
 		_objet.rect = pygame.Rect((x, y), (1, 1))
@@ -186,7 +201,10 @@ class Editeur():
 		if response:
 			response.kill()
 
-		objet.Sol(position, (self.taille_case, self.taille_case))
+		''' Si on ne remplace pas la case (clique droit), on remplace par du sol '''
+		if not replace:
+			self.niveau.coord["terrain"][pos_x][pos_y]["type"] = "sol"
+			objet.Sol(position, (self.taille_case, self.taille_case))
 
 	def select_case(self, x, y):
 		''' Selectionne une case du niveau puis affiche les infos '''
@@ -233,6 +251,7 @@ class Editeur():
 			self.case_selection_cible = []
 
 	def add_case_cible(self, x, y):
+		''' Ajoute une cible à la case sélectionnée '''
 		pos_x = math.floor(x/self.taille_case)
 		pos_y = math.floor(y/self.taille_case)
 		case_cible = self.niveau.coord["terrain"][pos_x][pos_y]

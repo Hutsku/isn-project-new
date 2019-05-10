@@ -40,6 +40,10 @@ class Dongeon ():
 				type_case = case["type"]
 				if type_case == "mur":
 					objet.Mur(position, (taille_case, taille_case))
+				if type_case == "eau":
+					objet.Eau(position, (taille_case, taille_case))
+				if type_case == "vide":
+					objet.Vide(position, (taille_case, taille_case))
 				if type_case == "sol":
 					objet.Sol(position, (taille_case, taille_case))
 				if type_case == "fin":
@@ -58,6 +62,8 @@ class Dongeon ():
 					objet.PicIntervalle(position, (taille_case, taille_case))
 				if type_case == "pic interrupteur":
 					objet.PicInterrupteur(position, (taille_case, taille_case), interrupteur=case["cible"])
+				if type_case == "lave":
+					objet.Lave(position, (taille_case, taille_case))
 				y += 1
 			x += 1
 

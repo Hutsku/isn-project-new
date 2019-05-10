@@ -135,6 +135,15 @@ class Personnage(Character):
 
 # =============================================== OBJET IMMOBILE ========================================================
 
+class Sol(Objet):
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension):
+		super().__init__(position, dimension)
+		Sol.liste.add(self)
+
+		self.image = config.getImage("sol")
+		self.image = pygame.transform.scale(self.image, dimension)
+
 class Mur(Objet):
 	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
@@ -144,14 +153,22 @@ class Mur(Objet):
 		self.image = config.getImage("mur")
 		self.image = pygame.transform.scale(self.image, dimension)
 
-
-class Sol(Objet):
+class Eau(Mur):
 	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
-		Sol.liste.add(self)
+		Eau.liste.add(self)
 
-		self.image = config.getImage("sol")
+		self.image = config.getImage("eau")
+		self.image = pygame.transform.scale(self.image, dimension)
+
+class Vide(Mur):
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension):
+		super().__init__(position, dimension)
+		Vide.liste.add(self)
+
+		self.image = config.getImage("vide")
 		self.image = pygame.transform.scale(self.image, dimension)
 
 # ================================================ PORTE / INTERRUPTEUR ==================================================
@@ -165,7 +182,6 @@ class Porte(Objet):
 
 		self.image.fill((0, 200, 0))
 		self.statut = False # False => ferme
-
 
 class Interrupteur(Objet):
 	''' Interrupteur permettant d'activer un mecanisme / porte '''
@@ -374,6 +390,18 @@ class PicIntervalle(Pic):
 
 		super().update()
 
+class Lave(Pic):
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension):
+		super().__init__(position, dimension)
+		Lave.liste.add(self)
+
+		self.image = config.getImage("lave")
+		self.image = pygame.transform.scale(self.image, dimension)
+		self.hitbox = self.rect.copy()
+
+		self.degat = 10 # Inflige 10 dégats
+
 # ===================================================== AUTRES ==========================================================
 
 class SolSpawn(Sol):
@@ -383,7 +411,6 @@ class SolSpawn(Sol):
 		SolSpawn.liste.add(self)
 
 		self.image.fill((255, 0, 0))
-
 
 class Escalier(Sol):
 	liste = pygame.sprite.Group()
