@@ -12,13 +12,20 @@ def check_fin_niveau(dongeon_actuel):
 	for escalier in objet.Escalier.liste:
 		if escalier.statut:
 			dongeon_actuel.change_level()
+		
 
 class Dongeon ():
 	def __init__(self):
 		self.lien_dossier = "../niveau/"
 		self.niveau = None # aucun niveau par défaut
 		self.change_level() # Choisi un niveau aléatoirement
+		
+		self.timer = 30
 
+	def change_timer(self, temps):
+		self.timer += temps
+		return self.timer
+		
 	def build(self):
 		'''construit les murs et objets d'après les coordonnées du niveau'''
 		taille_case = config.getConfig()["taille_case"]

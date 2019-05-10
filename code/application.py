@@ -53,7 +53,7 @@ class Application :
         self._menu = False
         self._jeu = False
         self._quitter = False
-        self._transition = False
+        self._game_over = False
         self.ecran = None
  
     def start(self):
@@ -64,7 +64,6 @@ class Application :
 
     def menu(self) :
         ''' Affichage du menu '''
-        pygame.display.set_caption("MENU DU JEU")
         if self.ecran:
             self.ecran.detruire()
         self.ecran = Menu(self)
@@ -72,12 +71,19 @@ class Application :
         self._jeu = False
 
     def jeu(self):
-        pygame.display.set_caption("JEU EN COURS")
         if self.ecran:
             self.ecran.detruire()
         self.ecran = Jeu(self)
         self._jeu = True
         self._menu = False
+	
+    def game_over(self):
+        if self.ecran:
+            self.ecran.detruire()
+        #self.ecran = Jeu(self)
+        self._jeu = False
+        self._menu = False
+        self._game_over = True
 
 
 def check_statut_quitter(application):
@@ -89,8 +95,8 @@ def check_statut_menu(application):
 def check_statut_jeu(application):
     return application._jeu
 
-def check_statut_transition(application):
-    return application._transition
+def check_statut_game_over(application):
+    return application._game_over
 
 def get_perso(application):
     return application.ecran.perso

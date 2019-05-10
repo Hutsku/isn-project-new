@@ -43,6 +43,8 @@ class Character(Objet):
 		self.hitbox = self.rect
 		self.frame_invincibilite = 75 # nb de frame avant qu'une autre attaque puisse le toucher
 		self._frame_time = 0 # False si le timer est reset, sinon ce sera le nb de frame qu'il reste 
+		
+		self.temp_degat = 0 #valeur temporaire de degat a l'instant t
 
 	def move(self, coord=None):
 		''' Actualise la position de l'objet, selon ses vecteurs de vitesse '''
@@ -86,8 +88,13 @@ class Character(Objet):
 	def degat(self, valeur):
 		if not self._frame_time:
 			print("DEGAT !")
+			self.temp_degat = valeur
 			self._frame_time = self.frame_invincibilite # on initialise le compteur
-
+	
+	def check_degat(self):
+		degat = -self.temp_degat 
+		self.temp_degat = 0	#reset les degat a 0
+		return degat
 
 class Personnage(Character):
 	liste = pygame.sprite.Group()
@@ -291,7 +298,7 @@ class Pic(Sol):
 		self.image = pygame.transform.scale(self.image, dimension)
 		self.hitbox = self.rect.copy()
 
-		self.degat = 10
+		self.degat = 5 #met 5 de degat
 
 	def action(self, cible):
 		''' Inflige des dégats aux cibles'''

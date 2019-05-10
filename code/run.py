@@ -32,6 +32,15 @@ def dongeonEvent(app):
     environnement = application.get_dongeon(app)
     dongeon.check_fin_niveau(environnement) # On regarde si un escalier a été activé (pour changer de niveau)
 
+def timerEvent(app):
+	timer = app.ecran.environnement.change_timer(-1)
+	for chara in objet.Character.liste:
+		timer = app.ecran.environnement.change_timer(chara.check_degat())
+	print(timer)
+	if timer <= 0:
+		print("TIME'S UP")
+		app.game_over()
+
 # ========================================= BOUCLE PRINCIPALE ===========================================
 
 key_trad = {"a": 113, "z":119, "d":100, "q":97, "s":115} # traduction unicode et n° key
@@ -40,11 +49,14 @@ pic = objet.Pic((200, 200), (100, 100))
 app = application.Application()
 app.start()
 clock = pygame.time.Clock()
+pygame.time.set_timer(USEREVENT, 1000)
 
 boucle = True
 while boucle:	 
     clock.tick(120)
     pygame.display.set_caption(str(clock.get_fps()))
+	
+    ''' Quitter l'application '''
     if application.check_statut_quitter(app):
         boucle = False
 
@@ -87,6 +99,8 @@ while boucle:
                 if event.unicode == "p":
                     retour_menu = True
                     
+            if event.type == pygame.USEREVENT:
+                timerEvent(app)
 
             if event.type == KEYUP:
                 ''' L'event KEYUP ne donne pas de traduction unicode. J'utilise donc un dic fait maison '''
