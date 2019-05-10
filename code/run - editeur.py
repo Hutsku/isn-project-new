@@ -138,7 +138,8 @@ class Editeur():
 		for case in objet.Objet.liste:
 			case.kill()
 
-	def add_case(self, x, y):
+	def add_case(self, x, y, type_case=None):
+		''' Ajoute et/ou remplace une case du niveau '''
 		pos_x = math.floor(x/self.taille_case)
 		pos_y = math.floor(y/self.taille_case)
 		position = (pos_x*self.taille_case, pos_y*self.taille_case)
@@ -173,9 +174,11 @@ class Editeur():
 		self.niveau.coord["terrain"][pos_x][pos_y]["type"] = self.type_case
 
 	def supp_case(self, x, y):
+		''' Remplace la case du niveau par du sol '''
 		pos_x = math.floor(x/self.taille_case)
 		pos_y = math.floor(y/self.taille_case)
-		self.niveau.coord["terrain"][pos_x][pos_y]["type"] = None
+		position = (pos_x*self.taille_case, pos_y*self.taille_case)
+		self.niveau.coord["terrain"][pos_x][pos_y]["type"] = "sol"
 
 		_objet = pygame.sprite.Sprite() # on crée un point correspondant au clique de la souris
 		_objet.rect = pygame.Rect((x, y), (1, 1))
@@ -183,13 +186,27 @@ class Editeur():
 		if response:
 			response.kill()
 
-	def select_case(self, x, y, type_case=None):
+		objet.Sol(position, (self.taille_case, self.taille_case))
+
+	def select_case(self, x, y):
+		''' Selectionne une case du niveau puis affiche les infos '''
 		pos_x = math.floor(x/self.taille_case)
 		pos_y = math.floor(y/self.taille_case)
-		if not type_case:
-			type_case = self.niveau.coord["terrain"][pos_x][pos_y]["type"]
+		type_case = self.niveau.coord["terrain"][pos_x][pos_y]["type"]
 
 		self.case_selection = [pos_x, pos_y]
+
+		cible=None
+		if type_case in ["porte", "interrupteur", "interrupteur timer", "pic interrupteur"]:
+			cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
+
+		self.select_case_info(type_case, cible=cible)
+
+	def select_case_info(self, type_case, cible=None):
+		''' Modifie les infos de la case séléctionnée'''
+		if not cible:
+			cible = []
+
 		self.widg_label_case.change_text(text=type_case)
 		self.widg_image_case.change_image(image=config.getImage(type_case))
 
@@ -199,20 +216,17 @@ class Editeur():
 
 		''' On va créer les widget de pramètre correspondant à la case '''
 		if type_case == "porte":
-			nb_cible = len(self.niveau.coord["terrain"][pos_x][pos_y]["cible"])
-			self.widg_label_param.change_text(text="- Porte reliée à ({}) mécanisme(s).".format(nb_cible))
+			self.widg_label_param.change_text(text="- Porte reliée à ({}) mécanisme(s).".format(len(cible)))
 			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
-			self.case_selection_cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
+			self.case_selection_cible = cible
 		elif type_case in ["interrupteur", "interrupteur timer"]:
-			nb_cible = len(self.niveau.coord["terrain"][pos_x][pos_y]["cible"])
-			self.widg_label_param.change_text(text="- Interrupteur reliée à ({}) mécanisme(s).".format(nb_cible))
+			self.widg_label_param.change_text(text="- Interrupteur reliée à ({}) mécanisme(s).".format(len(cible)))
 			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
-			self.case_selection_cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
+			self.case_selection_cible = cible
 		elif type_case == "pic interrupteur":
-			nb_cible = len(self.niveau.coord["terrain"][pos_x][pos_y]["cible"])
-			self.widg_label_param.change_text(text="- Pic reliée à ({}) mécanisme(s).".format(nb_cible))
+			self.widg_label_param.change_text(text="- Pic reliée à ({}) mécanisme(s).".format(len(cible)))
 			self.widg_button_cible = widget.Button((10, 70), size=(200, 30), text="Selectionner cibles", action=(self.change_mode, "selection cible"), hoover_color=(200, 200, 255), centered=True, frame=self.frame2)
-			self.case_selection_cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
+			self.case_selection_cible = cible
 
 		else:
 			self.widg_label_param.change_text(text="Aucun(s) paramètre(s)")
@@ -224,8 +238,7 @@ class Editeur():
 		case_cible = self.niveau.coord["terrain"][pos_x][pos_y]
 
 		''' si la case ciblé est bien une cible potentielle ... '''
-		if case_cible["type"] in ["porte", "interrupteur", "pic interrupteur"]:
-			print(case_cible["type"])
+		if case_cible["type"] in ["porte", "interrupteur", "interrupteur timer", "pic interrupteur"]:
 			if not [pos_x, pos_y] in self.case_selection_cible: # si la case selectionné ne l'est pas
 				self.case_selection_cible.append([pos_x, pos_y])
 
@@ -253,8 +266,8 @@ class Editeur():
 
 		''' On met à jour les widget '''
 		nb_cible = len(case["cible"])
-		self.widg_label_param.text = "- Interrupteur reliée à ({}) mécanisme(s)".format(nb_cible)
-		self.widg_button_cible.text = "Selectionner cibles"
+		self.widg_label_param.change_text(text="- Interrupteur reliée à ({}) mécanisme(s)")
+		self.widg_button_cible.change_text(text="Selectionner cibles")
 		self.widg_button_cible.action = (self.change_mode, "selection cible")
 
 		self.case_selection_cible = []
@@ -265,6 +278,7 @@ class Editeur():
 	def change_type(self, type_case):
 		''' change le type de case selectionné '''
 		self.type_case = type_case
+		self.select_case_info(type_case)
 
 	def change_mode(self, mode):
 		''' change le mode de selection ou d'edition du niveau '''
@@ -290,7 +304,6 @@ class Editeur():
 
 			for pic in objet.PicInterrupteur.liste:
 				list_cible = []
-				print(pic)
 				for (cible_x, cible_y) in pic.interrupteur:
 					position_cible = (cible_x*taille_case, cible_y*taille_case)
 					for interrupteur in objet.Interrupteur.liste:

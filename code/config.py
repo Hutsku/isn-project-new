@@ -7,7 +7,7 @@ def init():
 	dic_image = {
 		"mur": pygame.image.load("../image/mur.png").convert(),
 		"sol": pygame.image.load("../image/sol.png").convert(),
-		"escalier": pygame.image.load("../image/fin.png").convert(),
+		"fin": pygame.image.load("../image/fin.png").convert(),
 		"porte": pygame.image.load("../image/porte.png").convert(),
 		"spawn": pygame.image.load("../image/spawn.png").convert(),
 		"interrupteur": pygame.image.load("../image/interrupteur_off.png").convert(),

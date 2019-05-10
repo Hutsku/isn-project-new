@@ -391,7 +391,7 @@ class Escalier(Sol):
 		super().__init__(position, dimension)
 		Escalier.liste.add(self)
 
-		self.image = config.getImage("escalier")
+		self.image = config.getImage("fin")
 		self.image = pygame.transform.scale(self.image, dimension)
 		self.hitbox = self.rect.copy()
 
