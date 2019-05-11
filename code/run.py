@@ -47,7 +47,7 @@ def timerEvent(app):
 ######################################
 
 mixer.init()
-music = mixer.Sound("Sky_Skating.wav")
+music = mixer.Sound("Thunderstorm.wav")
 
 # ========================================= BOUCLE PRINCIPALE ===========================================
 
