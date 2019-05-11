@@ -79,7 +79,7 @@ while boucle:
 
         widget.update()
         pygame.display.flip() # raffraichissement de la fenêtre
-        music.stop()          #lorsque le joueur et dans le menu alors pas de musique
+        music.stop()          #lorsque le joueur est dans le menu pas de musique
 
     ''' Boucle in game '''
     if application.check_statut_jeu(app):
