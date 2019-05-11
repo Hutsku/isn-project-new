@@ -469,7 +469,7 @@ def hitbox(groupe=Sol.liste):
 		''' Si il est bien sur un interrupteur et qu'il n'y a pas de notif ...'''
 		if collide(perso.hitbox, groupe=Interrupteur.liste):
 			if not perso._notif: 
-				perso.notif("(A) Interragir")
+				perso.notif("(spc) Interragir")
 		elif perso._notif: # Si il y a deja une notif mais que le perso n'est plus dessus, on supprime
 			perso.supp_notif()
 

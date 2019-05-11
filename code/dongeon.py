@@ -17,10 +17,11 @@ def check_fin_niveau(dongeon_actuel):
 class Dongeon ():
 	def __init__(self):
 		self.lien_dossier = "../niveau/"
+		self.nombre_lvl = -1 #nombre de niveau traversé	
 		self.niveau = None # aucun niveau par défaut
 		self.change_level() # Choisi un niveau aléatoirement
-		
-		self.timer = 30
+			
+		self.timer = 30 #temps d'un partie (en seconde)
 
 	def change_timer(self, temps):
 		self.timer += temps
@@ -119,6 +120,10 @@ class Dongeon ():
 		''' Renvoit le niveau actuel '''
 		return self.niveau
 
+	def get_nombre_de_lvl(self):
+		return self.nombre_lvl
+		print(self.nombre_lvl)
+		
 	# ================================== PARAMETRE NIVEAU ============================
 
 	def change_level(self, lien_niveau=""):
@@ -138,7 +143,8 @@ class Dongeon ():
 				
 		self.effacer() # Puis on efface le précedant ...
 		self.build() # ... et on construit le nouveau.
-
+		self.nombre_lvl += 1 #ajout d'un niveau
+		
 class Niveau ():
 	def __init__(self, lien):
 		self.lien_lvl = lien

@@ -3,17 +3,17 @@ import pygame
 from pygame.locals import *
 import time
 
-def update():
+def update(): #permet la mise a jour des widget
 	Widget.group.update()
 
-def event(event):
+def event(event): #permet de faire les events de widget
 	for widget in Widget.group:
 		widget.event(event)
 
-def return_key_name_unicode(event):
+def return_key_name_unicode(event): #permet d'obtenir l'unicode d'une touche
         return pygame.key.name(event.key), event.unicode
 
-class Widget(pygame.sprite.Sprite):
+class Widget(pygame.sprite.Sprite): #classe princiaple de widget
 	group = pygame.sprite.Group()
 
 	def __init__(self, position, size, frame=None):
@@ -62,7 +62,7 @@ class Widget(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect(topleft=self.rect.topleft)
 
 
-class Label(Widget):
+class Label(Widget): #pour du text
 	def __init__(self, position, size=(100, 30), color = [255, 255, 255], border = 0, border_color = [0, 0, 0], text = "", text_color = [0, 0, 0],
 	             centered = False, font = "arial", police = 14, frame=None, bold=False, hoover_color=None):
 
@@ -183,7 +183,7 @@ class Label(Widget):
 					self.change_color()
 
 
-class Image(Widget):
+class Image(Widget): #pour une image
 	def __init__(self, position, size=(100, 100), color = [0, 0, 0, 0], border = 0, border_color = [0, 0, 0], path = "", 
 				frame=None, image=None):
 
@@ -237,7 +237,7 @@ class Image(Widget):
 		self._build()
 
 
-class Button(Label):
+class Button(Label): #pour un bouton
 	def __init__(self, position, size=(100, 30), border = 0, border_color = [0, 0, 0], color = [255, 255, 255], text = "", text_color = [0, 0, 0],
 	 			centered = False, font = "arial", police = 14, action = None, frame=None, bold=False, hoover_color=None):
 
@@ -264,7 +264,7 @@ class Button(Label):
 					self.action()
 
 
-class ImageButton(Image):
+class ImageButton(Image): #pour un boutton image
 	def __init__(self, position, size=(100, 100), path = "", border = 0, border_color = [0, 0, 0], color = [255, 255, 255], 
 				action = None, frame=None, image=None):
 
@@ -291,7 +291,7 @@ class ImageButton(Image):
 					self.action()
 
 
-class Entry(Label):
+class Entry(Label): #pour un bouton a texte (a entrer)
 	def __init__(self, position, size=(100, 30), text = "", border = 0, border_color = [0, 0, 0], color = [255, 255, 255], text_color = [0, 0, 0], 
     			font = "arial", police = 14, frame=None):
 
@@ -361,7 +361,7 @@ class Entry(Label):
 			self._state_cursor = False
 
 
-class Frame(Widget):
+class Frame(Widget): #pour faire une uniforme
 	group = pygame.sprite.Group()
 
 	def __init__(self, position, size, frame=None, border=0, border_color=(0, 0, 0), color=(255, 255, 255)):

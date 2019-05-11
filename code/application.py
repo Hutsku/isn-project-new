@@ -4,7 +4,6 @@ from pygame.locals import *
 
 import config
 import editeur.widget as widget
-import hud
 import objet
 import dongeon
 
@@ -40,12 +39,11 @@ class Jeu:
         self.environnement = dongeon.Dongeon() # on initialise le dongeon (1 seul possible)
         self.spawn = self.environnement.get_spawn()
         self.perso = objet.Personnage(self.spawn, (taille_personnage, taille_personnage))
-
+		
     def detruire(self):
         ''' Efface tout les sprite de la fenêtre '''
         for sprite in objet.Objet.liste:
             sprite.kill()
- 
 
 class Application :
     """ Classe maîtresse gérant les différentes interfaces du jeu """
