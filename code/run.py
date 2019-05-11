@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+from pygame import *
 
 import config
 import hud
@@ -41,6 +42,13 @@ def timerEvent(app):
 		print("TIME'S UP")
 		app.game_over()
 
+######################################
+# fichier sonor
+######################################
+
+mixer.init()
+music = mixer.Sound("Sky_Skating.wav")
+
 # ========================================= BOUCLE PRINCIPALE ===========================================
 
 key_trad = {"a": 113, "z":119, "d":100, "q":97, "s":115} # traduction unicode et n° key
@@ -71,6 +79,7 @@ while boucle:
 
         widget.update()
         pygame.display.flip() # raffraichissement de la fenêtre
+        music.stop()          #lorsque le joueur et dans le menu alors pas de musique
 
     ''' Boucle in game '''
     if application.check_statut_jeu(app):
@@ -78,6 +87,7 @@ while boucle:
         perso = application.get_perso(app)
         fenetre.blit(fond, (0, 0)) # on colle le fond
         retour_menu = False
+        music.play()               #si le joueur et dans le jeu alors musique
 
         # on gère les evenements claviers et souris 
         for event in pygame.event.get():
@@ -96,7 +106,7 @@ while boucle:
                     perso.bas()
                 if event.unicode == "a":
                     perso.action()
-                if event.unicode == "p":
+                if event.key == K_ESCAPE:   #on appuie sur échape pour revenir au menu
                     retour_menu = True
                     
             if event.type == pygame.USEREVENT:
