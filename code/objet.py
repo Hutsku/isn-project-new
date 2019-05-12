@@ -4,7 +4,7 @@ from pygame.locals import *
 import config
 import editeur.widget as widget
 		
-# ======================================================== CLASSE MERE ==================================================
+# ======================================================== CLASSE MERE ================================================
 
 class Objet(pygame.sprite.Sprite):
 	liste = pygame.sprite.Group()
@@ -23,7 +23,7 @@ class Objet(pygame.sprite.Sprite):
 		''' Affiche le sprite sur l'écran '''
 		pygame.display.get_surface().blit(self.image, self.rect)
 
-# ======================================================= OBJET MOBILE ==================================================
+# ======================================================= OBJET MOBILE ================================================
 
 class Character(Objet):
 	liste = pygame.sprite.Group()
@@ -44,7 +44,7 @@ class Character(Objet):
 		self.frame_invincibilite = 75 # nb de frame avant qu'une autre attaque puisse le toucher
 		self._frame_time = 0 # False si le timer est reset, sinon ce sera le nb de frame qu'il reste 
 		
-		self.temp_degat = 0 #valeur temporaire de degat a l'instant t
+		self.temps_additionel = 0 # valeur temporaire de bonus ou malus de temps
 
 	def move(self, coord=None):
 		''' Actualise la position de l'objet, selon ses vecteurs de vitesse '''
@@ -86,15 +86,21 @@ class Character(Objet):
 		super().update()
 
 	def degat(self, valeur):
+		''' Inflige un malus de temps '''
 		if not self._frame_time:
 			print("DEGAT !")
-			self.temp_degat = valeur
+			self.temps_additionel = - valeur
 			self._frame_time = self.frame_invincibilite # on initialise le compteur
+
+	def bonus(self, valeur):
+		''' Ajoute un bonus de temps '''
+		print("BONUS !")
+		self.temps_additionel = valeur
 	
-	def check_degat(self):
-		degat = -self.temp_degat 
-		self.temp_degat = 0	#reset les degat a 0
-		return degat
+	def check_temps_additionel(self):
+		temps = self.temps_additionel
+		self.temps_additionel = 0	# reset les bonus/malus à 0	
+		return temps
 
 class Personnage(Character):
 	liste = pygame.sprite.Group()
@@ -133,7 +139,7 @@ class Personnage(Character):
 	def haut(self):
 		self.vy = -1
 
-# =============================================== OBJET IMMOBILE ========================================================
+# =============================================== OBJET IMMOBILE ======================================================
 
 class Sol(Objet):
 	liste = pygame.sprite.Group()
@@ -171,7 +177,7 @@ class Vide(Mur):
 		self.image = config.getImage("vide")
 		self.image = pygame.transform.scale(self.image, dimension)
 
-# ================================================ PORTE / INTERRUPTEUR ==================================================
+# ================================================ PORTE / INTERRUPTEUR ===============================================
 
 class Porte(Objet):
 	''' Porte pouvant tour à tour être ouverte ou fermée '''
@@ -302,7 +308,7 @@ class PorteInterrupteur(Porte):
 			else:
 				self.statut = False
 		
-# ==================================================== PIEGES ===========================================================
+# ==================================================== PIEGES =========================================================
 
 class Pic(Sol):
 	liste = pygame.sprite.Group()
@@ -402,7 +408,7 @@ class Lave(Pic):
 
 		self.degat = 10 # Inflige 10 dégats
 
-# ===================================================== AUTRES ==========================================================
+# ===================================================== AUTRES ========================================================
 
 class SolSpawn(Sol):
 	liste = pygame.sprite.Group()
@@ -428,6 +434,28 @@ class Escalier(Sol):
 		''' Met fin au niveau'''
 		self.statut = True
 
+# ===================================================== BONUS =========================================================
+
+class Bonus(Sol):
+	liste = pygame.sprite.Group()
+	def __init__(self, position, dimension):
+		super().__init__(position, dimension)
+		Bonus.liste.add(self)
+
+		self.image = config.getImage("bonus")
+		self.image = pygame.transform.scale(self.image, dimension)
+		self.hitbox = self.rect.copy()
+
+		self.bonus = 10
+
+	def action(self, cible):
+		''' Ajoute un bonus '''
+		if cible:
+			for objet in cible:
+				objet.bonus(self.bonus)
+
+			self.kill() # On supprime ensuite le bonus
+
 # ================================================== FONCTIONS GLOBALES ===============================================
 
 def update():
@@ -444,6 +472,9 @@ def update():
 	for objet in Porte.liste:
 		objet.update()
 		
+	for objet in Bonus.liste:
+		objet.update()	
+
 	for objet in Character.liste:
 		objet.update()
 

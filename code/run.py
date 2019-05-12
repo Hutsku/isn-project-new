@@ -36,7 +36,7 @@ def dongeonEvent(app):
 def timerEvent(app):
 	timer = app.ecran.environnement.change_timer(-1)
 	for chara in objet.Character.liste:
-		timer = app.ecran.environnement.change_timer(chara.check_degat())
+		timer = app.ecran.environnement.change_timer(chara.check_temps_additionel())
 	print(timer)
 	if timer <= 0:
 		print("TIME'S UP")
@@ -87,7 +87,7 @@ while boucle:
         perso = application.get_perso(app)
         fenetre.blit(fond, (0, 0)) # on colle le fond
         retour_menu = False
-        music.play()               #si le joueur et dans le jeu alors musique
+        #music.play()               # si le joueur et dans le jeu alors musique
 
         # on gère les evenements claviers et souris 
         for event in pygame.event.get():

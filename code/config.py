@@ -4,6 +4,10 @@ dic_image = {}
 
 def init():
 	global dic_image
+
+	surface = pygame.image.load("../image/sol.png").convert()
+	pygame.draw.circle(surface, (0, 0, 255), (120, 120), 75)
+
 	dic_image = {
 		"mur": pygame.image.load("../image/mur.png").convert(),
 		"eau": pygame.image.load("../image/eau.png").convert(),
@@ -20,6 +24,8 @@ def init():
 		"pic interrupteur": pygame.image.load("../image/pic_on.png").convert(),
 		"pic off": pygame.image.load("../image/pic_off.png").convert(),
 		"lave": pygame.image.load("../image/lave.png").convert(),
+
+		"bonus": surface,
 	}
 
 def getConfig():

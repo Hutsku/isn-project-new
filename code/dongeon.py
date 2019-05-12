@@ -40,30 +40,33 @@ class Dongeon ():
 				type_case = case["type"]
 				if type_case == "mur":
 					objet.Mur(position, (taille_case, taille_case))
-				if type_case == "eau":
+				elif type_case == "eau":
 					objet.Eau(position, (taille_case, taille_case))
-				if type_case == "vide":
+				elif type_case == "vide":
 					objet.Vide(position, (taille_case, taille_case))
-				if type_case == "sol":
+				elif type_case == "sol":
 					objet.Sol(position, (taille_case, taille_case))
-				if type_case == "fin":
+				elif type_case == "fin":
 					objet.Escalier(position, (taille_case, taille_case))
-				if type_case == "spawn":
+				elif type_case == "spawn":
 					objet.Sol(position, (taille_case, taille_case))
-				if type_case == "porte":
+				elif type_case == "porte":
 					objet.PorteInterrupteur(position, (taille_case, taille_case), interrupteur=case["cible"])
-				if type_case == "interrupteur":
+				elif type_case == "interrupteur":
 					objet.Interrupteur(position, (taille_case, taille_case), cible=case["cible"])
-				if type_case == "interrupteur timer":
+				elif type_case == "interrupteur timer":
 					objet.InterrupteurTimer(position, (taille_case, taille_case), cible=case["cible"])
-				if type_case == "pic":
+				elif type_case == "pic":
 					objet.Pic(position, (taille_case, taille_case))
-				if type_case == "pic intervalle":
+				elif type_case == "pic intervalle":
 					objet.PicIntervalle(position, (taille_case, taille_case))
-				if type_case == "pic interrupteur":
+				elif type_case == "pic interrupteur":
 					objet.PicInterrupteur(position, (taille_case, taille_case), interrupteur=case["cible"])
-				if type_case == "lave":
+				elif type_case == "lave":
 					objet.Lave(position, (taille_case, taille_case))
+				elif type_case == "bonus":
+					objet.Bonus(position, (taille_case, taille_case))
+
 				y += 1
 			x += 1
 
@@ -143,7 +146,7 @@ class Niveau ():
 	def __init__(self, lien):
 		self.lien_lvl = lien
 		self.spawn = None
-		self.coord = {"terrain": [], "objets": []}
+		self.coord = {"terrain": []}
 		
 		self.build()
 		
@@ -154,7 +157,6 @@ class Niveau ():
 
 			self.spawn = dic["spawn"]
 			self.coord["terrain"] = dic["terrain"]
-			self.coord["objets"] = dic["objets"]
 	
 
 	
