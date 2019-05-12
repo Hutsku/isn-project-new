@@ -26,8 +26,9 @@ def objetEvent():
     objet.hitbox() # on test les hitbox des sprites entre eux (dégat et trigger)
     objet.update() # on affiche les sprites à l'écran
 
-def hudEvent():
-    hud.hudfix()
+def hudEvent(app):
+    app.ecran.hud.update(app.ecran.environnement.get_temps(), app.ecran.environnement.get_nombre_de_lvl()) #update de l'hud avec le temps, et le score
+	
 
 def dongeonEvent(app):
     environnement = application.get_dongeon(app)
@@ -36,8 +37,8 @@ def dongeonEvent(app):
 def timerEvent(app):
 	timer = app.ecran.environnement.change_timer(-1)
 	for chara in objet.Character.liste:
-		timer = app.ecran.environnement.change_timer(chara.check_temps_additionel())
-	print(timer)
+		timer = app.ecran.environnement.change_timer(chara.check_degat())
+
 	if timer <= 0:
 		print("TIME'S UP")
 		app.game_over()
@@ -45,9 +46,9 @@ def timerEvent(app):
 ######################################
 # fichier sonor
 ######################################
-
+'''
 mixer.init()
-music = mixer.Sound("Thunderstorm.wav")
+music = mixer.Sound("../music/Thunderstorm.wav")'''
 
 # ========================================= BOUCLE PRINCIPALE ===========================================
 
@@ -79,9 +80,9 @@ while boucle:
 
         widget.update()
         pygame.display.flip() # raffraichissement de la fenêtre
-        music.stop()          #lorsque le joueur est dans le menu pas de musique
+#        music.stop()          #lorsque le joueur est dans le menu pas de musique
 
-    ''' Boucle in game '''
+    ''' Boucle du jeu '''
     if application.check_statut_jeu(app):
         fond.fill((100, 100, 100))
         perso = application.get_perso(app)
@@ -104,7 +105,7 @@ while boucle:
                     perso.haut()
                 if event.unicode == "s":
                     perso.bas()
-                if event.unicode == "a":
+                if event.unicode == " ": #regarde si c'est la touche espace
                     perso.action()
                 if event.key == K_ESCAPE:   #on appuie sur échape pour revenir au menu
                     retour_menu = True
@@ -123,6 +124,7 @@ while boucle:
         dongeonEvent(app) # Evenements relatifs au niveau en général
         #hudEvent() # Evenements relatifs à l'interface
         widget.update()
+        hudEvent(app)
 
         pygame.display.update() # raffraichissement de la fenêtre
         if retour_menu: app.menu()
