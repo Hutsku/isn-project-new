@@ -89,13 +89,13 @@ class Character(Objet):
 		''' Inflige un malus de temps '''
 		if not self._frame_time:
 			print("DEGAT !")
-			self.temps_additionel = - valeur
+			self.temps_additionel -= valeur
 			self._frame_time = self.frame_invincibilite # on initialise le compteur
 
 	def bonus(self, valeur):
 		''' Ajoute un bonus de temps '''
 		print("BONUS !")
-		self.temps_additionel = valeur
+		self.temps_additionel += valeur
 	
 	def check_temps_additionel(self):
 		temps = self.temps_additionel
@@ -434,8 +434,6 @@ class Escalier(Sol):
 		''' Met fin au niveau'''
 		self.statut = True
 
-# ===================================================== BONUS =========================================================
-
 class Bonus(Sol):
 	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
@@ -454,7 +452,9 @@ class Bonus(Sol):
 			for objet in cible:
 				objet.bonus(self.bonus)
 
-			self.kill() # On supprime ensuite le bonus
+			''' On fait ensuite "disparaître" le bonus '''
+			self.hitbox = None
+			self.image = pygame.transform.scale(config.getImage("sol"), self.size) 
 
 # ================================================== FONCTIONS GLOBALES ===============================================
 

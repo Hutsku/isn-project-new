@@ -70,9 +70,7 @@ class Editeur():
 		frame1 = widget.Frame((self.height+10, 10), (280, 90), color=(100, 100,100), border=1)
 		frame2 = widget.Frame((self.height+10, 110), (280, 280), color=(100, 100,100), border=1)
 		frame3 = widget.Frame((self.height+10, 400), (280, 130), color=(100, 100,100), border=1)
-		self.frame1 = frame1
-		self.frame2 = frame2
-		self.frame3 = frame3
+		self.frame2 = frame2 # On stocke le frame 2
 
 		''' FRAME 1 - Sauvegarde / Ouverture d'un niveau '''
 		self.widg_entry = widget.Entry((10, 10), border=0, border_color=(255, 0, 0), text="niveau1", frame=frame1)
@@ -102,6 +100,7 @@ class Editeur():
 		widget.ImageButton((170, 10), size=(30, 30), action=(self.change_type, "porte"), path="../image/porte.png", frame=frame3)
 		widget.ImageButton((170, 50), size=(30, 30), action=(self.change_type, "interrupteur"), path="../image/interrupteur_off.png", frame=frame3)
 		widget.ImageButton((170, 90), size=(30, 30), action=(self.change_type, "interrupteur timer"), path="../image/interrupteur_off.png", frame=frame3)
+		widget.ImageButton((210, 10), size=(30, 30), action=(self.change_type, "bonus"), path="../image/bonus.png", frame=frame3)
 
 		self.build_level()
 
@@ -115,30 +114,32 @@ class Editeur():
 				type_case = case["type"]
 				if type_case == "mur":
 					objet.Mur(position, (self.taille_case, self.taille_case))
-				if type_case == "eau":
+				elif type_case == "eau":
 					objet.Eau(position, (self.taille_case, self.taille_case))
-				if type_case == "vide":
+				elif type_case == "vide":
 					objet.Vide(position, (self.taille_case, self.taille_case))
-				if type_case == "sol":
+				elif type_case == "sol":
 					objet.Sol(position, (self.taille_case, self.taille_case))
-				if type_case == "fin":
+				elif type_case == "fin":
 					objet.Escalier(position, (self.taille_case, self.taille_case))
-				if type_case == "spawn":
+				elif type_case == "spawn":
 					objet.SolSpawn(position, (self.taille_case, self.taille_case))
-				if type_case == "porte":
+				elif type_case == "porte":
 					objet.PorteInterrupteur(position, (self.taille_case, self.taille_case), interrupteur=case["cible"])
-				if type_case == "interrupteur":
+				elif type_case == "interrupteur":
 					objet.Interrupteur(position, (self.taille_case, self.taille_case), cible=case["cible"])
-				if type_case == "interrupteur timer":
+				elif type_case == "interrupteur timer":
 					objet.InterrupteurTimer(position, (self.taille_case, self.taille_case), cible=case["cible"])
-				if type_case == "lave":
+				elif type_case == "lave":
 					objet.Lave(position, (self.taille_case, self.taille_case))
-				if type_case == "pic":
+				elif type_case == "pic":
 					objet.Pic(position, (self.taille_case, self.taille_case))
-				if type_case == "pic intervalle":
+				elif type_case == "pic intervalle":
 					objet.PicIntervalle(position, (self.taille_case, self.taille_case))
-				if type_case == "pic interrupteur":
+				elif type_case == "pic interrupteur":
 					objet.PicInterrupteur(position, (self.taille_case, self.taille_case), interrupteur=case["cible"])
+				elif type_case == "bonus":
+					objet.Bonus(position, (self.taille_case, self.taille_case))
 				y += 1
 			x += 1
 
@@ -153,8 +154,9 @@ class Editeur():
 		pos_y = math.floor(y/self.taille_case)
 		position = (pos_x*self.taille_case, pos_y*self.taille_case)
 
-		print(self.type_case)
 		self.supp_case(x, y, replace=True)
+		self.niveau.coord["terrain"][pos_x][pos_y]["type"] = self.type_case
+
 		if self.type_case == "mur":
 			objet.Mur(position, (self.taille_case, self.taille_case))
 		elif self.type_case == "eau":
@@ -186,6 +188,8 @@ class Editeur():
 		elif self.type_case == "pic interrupteur":
 			objet.PicInterrupteur(position, (self.taille_case, self.taille_case))
 			self.niveau.coord["terrain"][pos_x][pos_y]["cible"] = []
+		elif self.type_case == "bonus":
+			objet.Bonus(position, (self.taille_case, self.taille_case))
 		else:
 			print("type invalide: "+self.type_case)
 
@@ -395,7 +399,7 @@ class Editeur():
 	def save_level(self):
 		print("save")
 		lien = "../niveau/"+self.widg_entry.text+".txt"
-		dic = {"spawn": self.niveau.spawn, "terrain":self.niveau.coord["terrain"], "objets":self.niveau.coord["objets"]}
+		dic = {"spawn": self.niveau.spawn, "terrain":self.niveau.coord["terrain"]}
 		with open(lien, "w") as fichier:
 			json_dic = json.dumps(dic)
 			fichier.write(json_dic)
@@ -409,7 +413,6 @@ class Editeur():
 
 			self.niveau.spawn = dic["spawn"]
 			self.niveau.coord["terrain"] = dic["terrain"]
-			self.niveau.coord["objets"] = dic["objets"]
 			self.delete_level()
 			self.build_level()
 

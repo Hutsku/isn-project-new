@@ -37,7 +37,7 @@ def dongeonEvent(app):
 def timerEvent(app):
 	timer = app.ecran.environnement.change_timer(-1)
 	for chara in objet.Character.liste:
-		timer = app.ecran.environnement.change_timer(chara.check_degat())
+		timer = app.ecran.environnement.change_timer(chara.check_temps_additionel())
 
 	if timer <= 0:
 		print("TIME'S UP")
