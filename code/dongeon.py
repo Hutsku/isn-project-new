@@ -121,9 +121,12 @@ class Dongeon ():
 		return self.niveau
 
 	def get_nombre_de_lvl(self):
+		'''renvoit le nombre de niveau parcouru'''
 		return self.nombre_lvl
-		print(self.nombre_lvl)
-		
+	
+	def get_temps(self):
+		'''renvoit le temps actuelle'''
+		return self.timer
 	# ================================== PARAMETRE NIVEAU ============================
 
 	def change_level(self, lien_niveau=""):

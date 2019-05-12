@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 
+import editeur.widget as widget
 import config
 # ========================================= INITIALISATION =======================================
 config_info = config.getConfig()
@@ -12,6 +13,10 @@ class Hud():
 		self.dimension = (config_info["taille_HUD"], config_info["taille_level"])
 		self.largeur = config_info["taille_HUD"]
 		self.position = (config_info["taille_level"], 0)
+		self.taille_level = config_info["taille_level"]
+
+
+
 
 		self.image = pygame.image.load("../image/hud.png").convert()
 		self.image = pygame.transform.scale(self.image, self.dimension)
@@ -19,12 +24,16 @@ class Hud():
 		self.rect_hud = self.image.get_rect()
 		self.rect_hud.topleft = (config_info["taille_level"], 0)
 
-		taille_texte = 36
-		police = pygame.font.SysFont("Arial", taille_texte, True) 
+		self.widg_temps = widget.Label(((self.taille_level+(self.largeur/160)*22), (self.taille_level/800)*227), size=(112,36), color = (0, 0, 0, 0), text = "temps", text_color = (255, 255, 255), centered = True, police = 20, bold = True)
+		self.widg_score = widget.Label(((self.taille_level+(self.largeur/160)*22), (self.taille_level/800)*382), size=(112,36), color = (0, 0, 0, 0), text = "score", text_color = (255, 255, 255), centered = True, police = 20, bold = True)	
 		
-		
-	def affichage(self, temps):
-		print(temps)
-	
-	def update(self):
+	def update(self, temps, score):
 		pygame.display.get_surface().blit(self.image, self.rect_hud)
+		self.widg_temps.change_text(str(temps))
+		self.widg_score.change_text(str(score))
+		self.widg_score.update()
+		self.widg_temps.update()
+		
+	def kill(self):
+		self.widg_score.kill()
+		self.widg_temps.kill()

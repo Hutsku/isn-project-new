@@ -19,8 +19,6 @@ fenetre = pygame.display.set_mode(taille) # création de la fenêtre
 fond = pygame.Surface(taille)
 fond.fill((0, 0, 0))
 
-hud = hud.Hud()
-
 config.init()
 
 def objetEvent():
@@ -29,8 +27,7 @@ def objetEvent():
     objet.update() # on affiche les sprites à l'écran
 
 def hudEvent(app):
-    hud.affichage(app.ecran.environnement.get_nombre_de_lvl())
-    hud.update()
+    app.ecran.hud.update(app.ecran.environnement.get_temps(), app.ecran.environnement.get_nombre_de_lvl()) #update de l'hud avec le temps, et le score
 	
 
 def dongeonEvent(app):
@@ -41,7 +38,6 @@ def timerEvent(app):
 	timer = app.ecran.environnement.change_timer(-1)
 	for chara in objet.Character.liste:
 		timer = app.ecran.environnement.change_timer(chara.check_degat())
-	print(timer)
 	if timer <= 0:
 		print("TIME'S UP")
 		app.game_over()
