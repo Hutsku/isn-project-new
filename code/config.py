@@ -25,7 +25,7 @@ def init():
 		"pic off": pygame.image.load("../image/pic_off.png").convert(),
 		"lave": pygame.image.load("../image/lave.png").convert(),
 
-		"bonus": surface,
+		"bonus": pygame.image.load("../image/bonus.png").convert(),
 		"hud": pygame.image.load("../image/hud.png").convert(),
 	}
 
