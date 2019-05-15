@@ -30,7 +30,7 @@ class Editeur():
 		self.taille_case = config.getConfig()["taille_case"]
 		self.nb_case = config.getConfig()["nb_case"]
 
-		self.niveau = niveau = dongeon.Niveau("../niveau/niveau1.txt")
+		self.niveau = niveau = dongeon.Niveau("../niveau/exemple/blank_level.txt")
 		self.type_case = "mur"
 		self.type_mode = "selection"
 		self.case_selection = None
@@ -73,7 +73,7 @@ class Editeur():
 		self.frame2 = frame2 # On stocke le frame 2
 
 		''' FRAME 1 - Sauvegarde / Ouverture d'un niveau '''
-		self.widg_entry = widget.Entry((10, 10), border=0, border_color=(255, 0, 0), text="niveau1", frame=frame1)
+		self.widg_entry = widget.Entry((10, 10), border=0, border_color=(255, 0, 0), text="nom ?", frame=frame1)
 		widget.Button((150, 50), text="Ouvrir", frame=frame1, action=self.load_level, hoover_color=(200, 200, 255), centered=True)
 		widget.Button((10, 50), text="Enregistrer", frame=frame1, action=self.save_level, hoover_color=(200, 200, 255), centered=True)
 		

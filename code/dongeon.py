@@ -28,7 +28,7 @@ class Dongeon ():
 		return self.timer
 		
 	def build(self):
-		'''construit les murs et objets d'après les coordonnées du niveau'''
+		'''Construit les murs et objets d'après les coordonnées du niveau'''
 		taille_case = config.getConfig()["taille_case"]
 		taille_personnage = config.getConfig()["taille_personnage"]
 		spawn = (self.niveau.spawn[0]*taille_case, self.niveau.spawn[1]*taille_case)
