@@ -76,7 +76,8 @@ class Editeur():
 		self.widg_entry = widget.Entry((10, 10), border=0, border_color=(255, 0, 0), text="nom ?", frame=frame1)
 		widget.Button((150, 50), text="Ouvrir", frame=frame1, action=self.load_level, hoover_color=(200, 200, 255), centered=True)
 		widget.Button((10, 50), text="Enregistrer", frame=frame1, action=self.save_level, hoover_color=(200, 200, 255), centered=True)
-		
+		widget.Button((150, 10), text="Reset", frame=frame1, action=self.reset_level, hoover_color=(200, 200, 255), centered=True)
+
 		''' FRAME 2 - Paramètres de selection d'une case '''
 		self.widg_image_case = widget.Image((10, 10), size=(30, 30), border=1, path="", frame=frame2)
 		self.widg_label_case = widget.Label((40, 10), size=(150, 30), text="None", color=(100, 100, 100), frame=frame2)
@@ -397,6 +398,7 @@ class Editeur():
 			self.case_selection_cible = []
 
 	def save_level(self):
+		''' Enregistre la map actuelle'''
 		print("save")
 		lien = "../niveau/"+self.widg_entry.text+".txt"
 		dic = {"spawn": self.niveau.spawn, "terrain":self.niveau.coord["terrain"]}
@@ -405,8 +407,22 @@ class Editeur():
 			fichier.write(json_dic)
 
 	def load_level(self):
+		'''Charge une map '''
 		print("load")
 		lien = "../niveau/"+self.widg_entry.text+".txt"
+		with open(lien, "r") as fichier:
+			json_dic = fichier.read()
+			dic = json.loads(json_dic)
+
+			self.niveau.spawn = dic["spawn"]
+			self.niveau.coord["terrain"] = dic["terrain"]
+			self.delete_level()
+			self.build_level()
+
+	def reset_level(self):
+		''' Charge la map de base '''
+		print("load")
+		lien = "../niveau/exemple/blank_level.txt"
 		with open(lien, "r") as fichier:
 			json_dic = fichier.read()
 			dic = json.loads(json_dic)
