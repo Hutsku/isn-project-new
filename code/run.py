@@ -15,6 +15,11 @@ pygame.init()
 config_dic = config.getConfig()
 taille = config_dic["taille_ecran"]
 
+k_droite = str(config_dic["droite"])
+k_gauche = str(config_dic["gauche"])
+k_bas = str(config_dic["bas"])
+k_haut = str(config_dic["haut"])
+
 fenetre = pygame.display.set_mode(taille) # création de la fenêtre
 fond = pygame.Surface(taille)
 fond.fill((0, 0, 0))
@@ -82,6 +87,18 @@ while boucle:
         pygame.display.flip() # raffraichissement de la fenêtre
 #        music.stop()          #lorsque le joueur est dans le menu pas de musique
 
+    ''' boucle game over '''
+    if application.check_statut_game_over(app):
+        fond.fill((0, 0, 0))
+        fenetre.blit(fond, (0, 0)) # on colle le fond
+        for event in pygame.event.get():
+            widget.event(event) # Gestion des evenements sur les widget (pour les boutons par ex)
+            if event.type == QUIT: #si clic sur croix rouge
+                boucle = False
+
+        widget.update()
+        pygame.display.flip() # raffraichissement de la fenêtre		
+
     ''' Boucle du jeu '''
     if application.check_statut_jeu(app):
         fond.fill((100, 100, 100))
@@ -119,12 +136,11 @@ while boucle:
                    perso.vx = 0
                 if key_trad["z"] == event.key or key_trad["s"] == event.key:
                     perso.vy = 0
-
-        objetEvent() # Evenements relatifs aux objets
-        dongeonEvent(app) # Evenements relatifs au niveau en général
-        #hudEvent() # Evenements relatifs à l'interface
-        widget.update()
-        hudEvent(app)
+        if not application.check_statut_game_over(app):		
+            objetEvent() # Evenements relatifs aux objets
+            dongeonEvent(app) # Evenements relatifs au niveau en général
+            widget.update()
+            hudEvent(app)
 
         pygame.display.update() # raffraichissement de la fenêtre
         if retour_menu: app.menu()

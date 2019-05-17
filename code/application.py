@@ -30,6 +30,27 @@ class Menu :
         self.widg_jouer.kill()
         self.widg_quitter.kill() 
  
+
+class Game_over :
+    """ Création et gestion des boutons d'un menu """
+    def __init__(self, application) : 
+        print("yolo")
+        # noms des menus et commandes associées
+
+        width = 200
+        height = 50
+        x = taille_ecran[0]/2 - (width/2)
+        y = taille_ecran[1]/3 - (height/2)
+        self.widg_rejouer = widget.Button((x, y), size=(width, height), text="REJOUER", action=application.jeu, 
+                font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(0, 255, 0))
+        self.widg_menu = widget.Button((x, 2*y), size=(width, height), text="MENU", action=application.menu, 
+                font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(255, 0, 0))
+
+    def detruire(self) :
+        self.widg_rejouer.kill()
+        self.widg_menu.kill()
+		
+		
 class Jeu:
     def __init__(self, application):
         taille_ecran = config["taille_ecran"]
@@ -69,6 +90,7 @@ class Application :
         self.ecran = Menu(self)
         self._menu = True
         self._jeu = False
+        self._game_over= False
 
     def jeu(self):
         if self.ecran:
@@ -76,16 +98,16 @@ class Application :
         self.ecran = Jeu(self)
         self._jeu = True
         self._menu = False
+        self._game_over = False
 	
     def game_over(self):
         if self.ecran:
             self.ecran.detruire()
-        #self.ecran = Jeu(self)
+            self.ecran = Game_over(self)
         self._jeu = False
         self._menu = False
         self._game_over = True
-
-
+		
 def check_statut_quitter(application):
     return application._quitter
     
@@ -102,5 +124,4 @@ def get_perso(application):
     return application.ecran.perso
 
 def get_dongeon(application):
-    return application.ecran.environnement
-
+	return application.ecran.environnement
