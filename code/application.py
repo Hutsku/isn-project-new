@@ -33,10 +33,9 @@ class Menu :
 
 class Game_over :
     """ Création et gestion des boutons d'un menu """
-    def __init__(self, application) : 
-        print("yolo")
+    def __init__(self, application, score) : 
         # noms des menus et commandes associées
-
+        score = str(score)
         width = 200
         height = 50
         x = taille_ecran[0]/2 - (width/2)
@@ -45,10 +44,13 @@ class Game_over :
                 font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(0, 255, 0))
         self.widg_menu = widget.Button((x, 2*y), size=(width, height), text="MENU", action=application.menu, 
                 font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(255, 0, 0))
-
+        self.widg_score = widget.Label((x,1.5*y), size=(width, height), text=score, font="Razer Regular", centered=True, police=26, bold=True)
+		
+		
     def detruire(self) :
         self.widg_rejouer.kill()
         self.widg_menu.kill()
+		self.widg_score()
 		
 		
 class Jeu:
@@ -100,10 +102,10 @@ class Application :
         self._menu = False
         self._game_over = False
 	
-    def game_over(self):
+    def game_over(self, score):
         if self.ecran:
             self.ecran.detruire()
-            self.ecran = Game_over(self)
+            self.ecran = Game_over(self, score)
         self._jeu = False
         self._menu = False
         self._game_over = True
