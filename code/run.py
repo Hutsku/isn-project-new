@@ -46,7 +46,7 @@ def timerEvent(app):
 
 	if timer <= 0:
 		print("TIME'S UP")
-		app.game_over()
+		app.game_over(app.ecran.environnement.get_nombre_de_lvl())
 
 ######################################
 # fichier sonor
@@ -54,7 +54,6 @@ def timerEvent(app):
 '''
 mixer.init()
 music = mixer.Sound("../music/Thunderstorm.wav")
-
 son = mixer.Sound("../music/bruitage1.wav")'''
 
 
