@@ -53,7 +53,11 @@ def timerEvent(app):
 ######################################
 '''
 mixer.init()
-music = mixer.Sound("../music/Thunderstorm.wav")'''
+music = mixer.Sound("../music/Thunderstorm.wav")
+
+son = mixer.Sound("../music/bruitage1.wav")'''
+
+
 
 # ========================================= BOUCLE PRINCIPALE ===========================================
 
@@ -85,7 +89,7 @@ while boucle:
 
         widget.update()
         pygame.display.flip() # raffraichissement de la fenêtre
-#        music.stop()          #lorsque le joueur est dans le menu pas de musique
+       # music.stop()          #lorsque le joueur est dans le menu pas de musique
 
     ''' boucle game over '''
     if application.check_statut_game_over(app):
@@ -97,7 +101,8 @@ while boucle:
                 boucle = False
 
         widget.update()
-        pygame.display.flip() # raffraichissement de la fenêtre		
+        pygame.display.flip() # raffraichissement de la fenêtre
+		#music.stop()          #lorsque le joueur est game over plus de musique	
 
     ''' Boucle du jeu '''
     if application.check_statut_jeu(app):
