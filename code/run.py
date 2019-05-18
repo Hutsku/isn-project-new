@@ -1,3 +1,4 @@
+#========================================== IMPORT FICHIERS NECESSAIRES ================================================
 import pygame
 from pygame.locals import *
 from pygame import *
@@ -10,47 +11,49 @@ import objet
 import editeur.widget as widget
 
 #========================================== IMPORT CONFIIG ================================================
-pygame.init()
+pygame.init() #initialise pygame
 
-config_dic = config.getConfig()
-taille = config_dic["taille_ecran"]
+config_dic = config.getConfig() #recupere les configs
+taille = config_dic["taille_ecran"] #definie la taille de l'ecran
 
-k_droite = str(config_dic["droite"])
-k_gauche = str(config_dic["gauche"])
-k_bas = str(config_dic["bas"])
-k_haut = str(config_dic["haut"])
 
 fenetre = pygame.display.set_mode(taille) # création de la fenêtre
-fond = pygame.Surface(taille)
-fond.fill((0, 0, 0))
+fond = pygame.Surface(taille) #creation d'un fond
 
-config.init()
+config.init() #initialisation de la config (pour les images)
 
+debug = config_dic["debug"]
+
+#========================================== FONCTION D'EVENT ================================================
 def objetEvent():
-    objet.move() # On actualise la position des objets sur l'écran (collision etc)
-    objet.hitbox() # on test les hitbox des sprites entre eux (dégat et trigger)
-    objet.update() # on affiche les sprites à l'écran
+        '''event lié aux objet'''
+        objet.move() # On actualise la position des objets sur l'écran (collision etc)
+        objet.hitbox() # on test les hitbox des sprites entre eux (dégat et trigger)
+        objet.update() # on affiche les sprites à l'écran
 
 def hudEvent(app):
-    app.ecran.hud.update(app.ecran.environnement.get_temps(), app.ecran.environnement.get_nombre_de_lvl()) #update de l'hud avec le temps, et le score
+        '''event lié a l'hud'''
+        app.ecran.hud.update(app.ecran.environnement.get_temps(), app.ecran.environnement.get_nombre_de_lvl()) #update de l'hud avec le temps, et le score
 	
 
 def dongeonEvent(app):
-    environnement = application.get_dongeon(app)
-    dongeon.check_fin_niveau(environnement) # On regarde si un escalier a été activé (pour changer de niveau)
+        '''event lié au dongeon'''
+        environnement = application.get_dongeon(app)
+        dongeon.check_fin_niveau(environnement) # On regarde si un escalier a été activé (pour changer de niveau)
 
 def timerEvent(app):
-	timer = app.ecran.environnement.change_timer(-1)
-	for chara in objet.Character.liste:
-		timer = app.ecran.environnement.change_timer(chara.check_temps_additionel())
+        '''event lié au timer'''
+        timer = app.ecran.environnement.change_timer(-1) #perd 1 seconde
+        for chara in objet.Character.liste:
+                timer = app.ecran.environnement.change_timer(chara.check_temps_additionel()) #ajoute le temps bonus des personnages
 
-	if timer <= 0:
-		print("TIME'S UP")
-		app.game_over(app.ecran.environnement.get_nombre_de_lvl())
+        if timer <= 0: #si le timer est arrivé a 0
+                print("TIME'S UP") #debug
+                app.game_over(app.ecran.environnement.get_nombre_de_lvl()) #affiche le game over (avec le score)
 
-######################################
-# fichier sonor
-######################################
+#########################################
+#           fichier sonor	        #
+#########################################
 '''
 mixer.init()
 music = mixer.Sound("../music/Thunderstorm.wav")
@@ -61,94 +64,96 @@ son = mixer.Sound("../music/bruitage1.wav")'''
 # ========================================= BOUCLE PRINCIPALE ===========================================
 
 key_trad = {"a": 113, "z":119, "d":100, "q":97, "s":115} # traduction unicode et n° key
-pic = objet.Pic((200, 200), (100, 100))
 
-app = application.Application()
-app.start()
-clock = pygame.time.Clock()
-pygame.time.set_timer(USEREVENT, 1000)
+pic = objet.Pic((200, 200), (100, 100)) #initialise les pics (wtf)
 
-boucle = True
+app = application.Application() #initialise l'application qui gere les differents menus
+app.start() #demarre l'application
+
+clock = pygame.time.Clock() #initialise un horloge
+pygame.time.set_timer(USEREVENT, 1000) #creation d'un event de temps toute les secondes (utile pour le compte a rebour)
+
+pygame.display.set_caption("Under the infinite dongeon") #Cahnge le nom de la fenetre
+
+boucle = True #petmet le fonctionnement de la boucle principale
+
 while boucle:	 
-    clock.tick(120)
-    pygame.display.set_caption(str(clock.get_fps()))
+    clock.tick(config_dic["fps"]) #definie le nombre de frame max par seconde (fps)
+    if debug :
+        pygame.display.set_caption(str(clock.get_fps())) #permet d'afficher le nombre de fps a la place du nom de la fenetre (debug)
 	
     ''' Quitter l'application '''
-    if application.check_statut_quitter(app):
-        boucle = False
+    if application.check_statut_quitter(app): #voir fichier application
+        boucle = False #fin programme
 
     ''' Boucle du menu '''
-    if application.check_statut_menu(app):
-        fond.fill((0, 0, 0))
+    if application.check_statut_menu(app): #voir fichier application
+        fond.fill((0, 0, 0)) #'''a changer''' #change la couleurs du fond en noir
         fenetre.blit(fond, (0, 0)) # on colle le fond
         for event in pygame.event.get():
             widget.event(event) # Gestion des evenements sur les widget (pour les boutons par ex)
             if event.type == QUIT: #si clic sur croix rouge
-                boucle = False
+                boucle = False #fin programme
 
-        widget.update()
+        widget.update() #update des widgets
         pygame.display.flip() # raffraichissement de la fenêtre
        # music.stop()          #lorsque le joueur est dans le menu pas de musique
 
     ''' boucle game over '''
     if application.check_statut_game_over(app):
-        fond.fill((0, 0, 0))
+        fond.fill((0, 0, 0)) #'''a changer''' #change la couleurs du fond en noir
         fenetre.blit(fond, (0, 0)) # on colle le fond
         for event in pygame.event.get():
             widget.event(event) # Gestion des evenements sur les widget (pour les boutons par ex)
             if event.type == QUIT: #si clic sur croix rouge
-                boucle = False
+                boucle = False #fin programme
 
-        widget.update()
-        pygame.display.flip() # raffraichissement de la fenêtre
-		#music.stop()          #lorsque le joueur est game over plus de musique	
+        widget.update() #update des widgets
+        pygame.display.flip() # raffraichissement de la fenêtre	
 
     ''' Boucle du jeu '''
-    if application.check_statut_jeu(app):
-        fond.fill((100, 100, 100))
-        perso = application.get_perso(app)
-        fenetre.blit(fond, (0, 0)) # on colle le fond
-        retour_menu = False
-        #music.play()               # si le joueur et dans le jeu alors musique
+    if application.check_statut_jeu(app): #voir fichier application
+        perso = application.get_perso(app) #voir fichier application
+        retour_menu = False #permet de desactiver le retour menu
 
-        # on gère les evenements claviers et souris 
+        # on gère les evenements claviers, souris et temps
         for event in pygame.event.get():
             widget.event(event) # Gestion des evenements sur les widget (pour les boutons par ex)
             if event.type == QUIT: #si clic sur croix rouge
-                boucle = False
+                boucle = False #fin programme
                     
-            if event.type == KEYDOWN:
-                if event.unicode == "d":
-                    perso.droite()
-                if event.unicode == "q":
-                    perso.gauche()
-                if event.unicode == "z":
-                    perso.haut()
-                if event.unicode == "s":
-                    perso.bas()
+            if event.type == KEYDOWN: #permet de detecter une touche enfoncée
+                if event.unicode == "d": #regarde si c'est la touche d
+                    perso.droite() #voir fichier objet ligne 145
+                if event.unicode == "q": #regarde si c'est la touche q
+                    perso.gauche() #voir fichier objet ligne 142
+                if event.unicode == "z": #regarde si c'est la touche z
+                    perso.haut() #voir fichier objet ligne 151
+                if event.unicode == "s": #regarde si c'est la touche s
+                    perso.bas() #voir fichier objet ligne 148
                 if event.unicode == " ": #regarde si c'est la touche espace
-                    perso.action()
+                    perso.action() #voir fichier objet ligne 80
                 if event.key == K_ESCAPE:   #on appuie sur échape pour revenir au menu
-                    retour_menu = True
+                    retour_menu = True #permet un retour menu
                     
-            if event.type == pygame.USEREVENT:
-                timerEvent(app)
+            if event.type == pygame.USEREVENT: #si il y a un USEREVENT (c'est a dire toute les seconde, voir ligne 74)
+                timerEvent(app) #voir ligne 44
 
-            if event.type == KEYUP:
+            if event.type == KEYUP: #permet de detecter une touche relachée
                 ''' L'event KEYUP ne donne pas de traduction unicode. J'utilise donc un dic fait maison '''
                 if key_trad["d"] == event.key or key_trad["q"] == event.key:
-                   perso.vx = 0
+                   perso.vx = 0 #reinitialise la vitesse personnage a 0
                 if key_trad["z"] == event.key or key_trad["s"] == event.key:
-                    perso.vy = 0
-        if not application.check_statut_game_over(app):		
-            objetEvent() # Evenements relatifs aux objets
-            dongeonEvent(app) # Evenements relatifs au niveau en général
-            widget.update()
-            hudEvent(app)
+                    perso.vy = 0 #reinitialise la vitesse personnage a 0
+        if not application.check_statut_game_over(app):	#voir fichier application	
+            objetEvent() # voir ligne 28
+            dongeonEvent(app) # voir ligne 39
+            widget.update() #voir fichier widget
+            hudEvent(app) #voir ligne 34
 
         pygame.display.update() # raffraichissement de la fenêtre
-        if retour_menu: app.menu()
-
-
+        
+        if retour_menu:
+                app.menu() #retourne au menu
 # ================================================================================================
 # '''

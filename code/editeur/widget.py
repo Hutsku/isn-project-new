@@ -1,7 +1,9 @@
-
+#========================================== IMPORT FICHIERS NECESSAIRES ================================================
 import pygame
 from pygame.locals import *
 import time
+
+#========================================= CREATION WIDGET =============================================================
 
 def update(): #permet la mise a jour des widget
 	Widget.group.update()
