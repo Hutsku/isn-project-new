@@ -26,9 +26,9 @@ class Menu :
         x = taille_ecran[0]/2 - (width/2)
         y = taille_ecran[1]/3 - (height/2)
         self.widg_jouer = widget.Button((x, y), size=(width, height), text="JOUER", action=application.jeu,  #bouton jouer
-                font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(0, 255, 0))
+                font="Razer Regular", centered=True, police=24, bold=True, hoover_color=(0, 255, 0))
         self.widg_quitter = widget.Button((x, 2*y), size=(width, height), text="QUITTER", action=application.quitter, #bouton quitter
-                font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(255, 0, 0))
+                font="Razer Regular", centered=True, police=24, bold=True, hoover_color=(255, 0, 0))
 
     def detruire(self) : #permet de supprimer les boutons
         self.widg_jouer.kill()
@@ -37,8 +37,11 @@ class Menu :
 
 class Game_over :
     """ Création et gestion des boutons du game over """
-    def __init__(self, application, score) : 
-		
+    def __init__(self, application, score) :
+
+        for  widg in widget.Widget.group: #empeche les notifs de rester affichées
+            widg.kill()
+			
         score = str(score)
         width = 200
         height = 50

@@ -88,7 +88,8 @@ while boucle:
 
     ''' Boucle du menu '''
     if application.check_statut_menu(app): #voir fichier application
-        fond.fill((0, 0, 0)) #'''a changer''' #change la couleurs du fond en noir
+        fond = config.getImage("fond menu")	#recuperation de l'image du fond menu
+        fond = pygame.transform.scale(fond, taille) #redimension de l'image
         fenetre.blit(fond, (0, 0)) # on colle le fond
         for event in pygame.event.get():
             widget.event(event) # Gestion des evenements sur les widget (pour les boutons par ex)
@@ -101,7 +102,8 @@ while boucle:
 
     ''' boucle game over '''
     if application.check_statut_game_over(app):
-        fond.fill((0, 0, 0)) #'''a changer''' #change la couleurs du fond en noir
+        fond = config.getImage("fond game over")	#recuperation de l'image du fond menu
+        fond = pygame.transform.scale(fond, taille) #redimension de l'image
         fenetre.blit(fond, (0, 0)) # on colle le fond
         for event in pygame.event.get():
             widget.event(event) # Gestion des evenements sur les widget (pour les boutons par ex)
@@ -156,4 +158,5 @@ while boucle:
         if retour_menu:
                 app.menu() #retourne au menu
 # ================================================================================================
+# '''
 # '''

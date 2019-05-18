@@ -18,7 +18,7 @@ class Hud(): #classe de l'hud
 
 
 
-		self.image = pygame.image.load("../image/hud.png").convert() #recupere l'image de l'hud
+		self.image = config.getImage("hud") #recupere l'image de l'hud
 		self.image = pygame.transform.scale(self.image, self.dimension) #redimensionne l'image (uniquement en cas de changement de taille de la fenetre)
 		
 		self.rect_hud = self.image.get_rect() 

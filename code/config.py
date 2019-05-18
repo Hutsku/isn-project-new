@@ -31,6 +31,9 @@ def init():
 
 		"bonus": pygame.image.load("../image/bonus.png").convert(),
 		"hud": pygame.image.load("../image/hud.png").convert(),
+		
+		"fond menu": pygame.image.load("../image/menu_fond.png").convert(),
+		"fond game over" : pygame.image.load("../image/game_over.png").convert(),
 	}
 
 #==========================================  CONFIGS ==================================================================
