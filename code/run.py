@@ -73,7 +73,7 @@ app.start() #demarre l'application
 clock = pygame.time.Clock() #initialise un horloge
 pygame.time.set_timer(USEREVENT, 1000) #creation d'un event de temps toute les secondes (utile pour le compte a rebour)
 
-pygame.display.set_caption("Under the infinite dongeon") #Cahnge le nom de la fenetre
+pygame.display.set_caption("Under the infinite dungeon") #Cahnge le nom de la fenetre
 
 boucle = True #petmet le fonctionnement de la boucle principale
 
