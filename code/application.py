@@ -44,13 +44,13 @@ class Game_over :
                 font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(0, 255, 0))
         self.widg_menu = widget.Button((x, 2*y), size=(width, height), text="MENU", action=application.menu, 
                 font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(255, 0, 0))
-        self.widg_score = widget.Label((x,1.5*y), size=(width, height), text=score, font="Razer Regular", centered=True, police=26, bold=True)
-		
-		
+        self.widg_score = widget.Label((0.75*x,1.5*y), size=(2*width, height), text="Score de la partie: " + score, text_color = (200,200,200), font="Razer Regular", centered=True, police=26, bold=True, color = (0,0,0,0))
+
+
     def detruire(self) :
         self.widg_rejouer.kill()
         self.widg_menu.kill()
-		self.widg_score()
+        self.widg_score.kill()
 		
 		
 class Jeu:
