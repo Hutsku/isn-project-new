@@ -1,0 +1,10 @@
+Voici le projet d'ISN de l'année 2018-2019 de:
+	ROUXEL Armel
+	COLAS Quentin
+	DE FAUVERGE Florent
+
+Ce jeu nécessite d'avoir python 3.7 d'installé ainsi que le module pygame.
+(pour ça lancer python et écrire "import pygame", puis appuyer sur "entrée" (les droits d'aministrateur sont nécessaires)
+
+Pour jouer lancer run.py
+Pour créer un niveau lancer run-editeur.py (attention les niveaux 1 a 30 sont déjà créés)
