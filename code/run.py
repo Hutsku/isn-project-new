@@ -68,9 +68,13 @@ app.start()
 clock = pygame.time.Clock()
 pygame.time.set_timer(USEREVENT, 1000)
 
+light = pygame.image.load('../image/light.png').convert_alpha()
+light = pygame.transform.scale(light, (200, 200))
+brouillard = pygame.surface.Surface((config_dic["taille_level"], config_dic["taille_level"])).convert()
+
 boucle = True
 while boucle:	 
-    clock.tick(120)
+    clock.tick()
     pygame.display.set_caption(str(clock.get_fps()))
 	
     ''' Quitter l'application '''
@@ -107,7 +111,6 @@ while boucle:
     if application.check_statut_jeu(app):
         fond.fill((100, 100, 100))
         perso = application.get_perso(app)
-        fenetre.blit(fond, (0, 0)) # on colle le fond
         retour_menu = False
         #music.play()               # si le joueur et dans le jeu alors musique
 
@@ -140,13 +143,18 @@ while boucle:
                    perso.vx = 0
                 if key_trad["z"] == event.key or key_trad["s"] == event.key:
                     perso.vy = 0
+
         if not application.check_statut_game_over(app):		
             objetEvent() # Evenements relatifs aux objets
             dongeonEvent(app) # Evenements relatifs au niveau en général
             widget.update()
             hudEvent(app)
 
-        pygame.display.update() # raffraichissement de la fenêtre
+        brouillard.fill((50, 50, 50))
+        brouillard.blit(light, (perso.rect.centerx-100, perso.rect.centery-100))
+        fenetre.blit(brouillard, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
+
+        pygame.display.flip() # raffraichissement de la fenêtre
         if retour_menu: app.menu()
 
 
