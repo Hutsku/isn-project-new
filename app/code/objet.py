@@ -9,10 +9,10 @@ import editeur.widget as widget
 # ======================================================== CLASSE MERE ================================================
 
 class Objet(pygame.sprite.Sprite):
-	liste = pygame.sprite.Group()
+	liste = pygame.sprite.Group() #creation de la liste relative au objet
 	def __init__(self, position, dimension):
 		super().__init__()
-		Objet.liste.add(self)
+		Objet.liste.add(self) #s'ajoute a la liste
 
 		self.image = pygame.Surface(dimension) #image de l'objet
 		self.rect = self.image.get_rect() #dimension de l'image
@@ -34,7 +34,7 @@ class Character(Objet):
 	
 	def __init__ (self, position, dimension):
 		super().__init__(position, dimension)
-		Character.liste.add(self) #sajoute a la liste
+		Character.liste.add(self) #s'ajoute a la liste
 
 		self.speed = 1 # Coef de vitesse
 
@@ -119,9 +119,21 @@ class Personnage(Character):
 		dim = int(dim) #transforme la dimension en nombre entier
 		self.dimension = (dim, dim) # recreer la dimension du personnage sous forme (x,y)
 		self.speed = 3 #vitesse du personnage
-		self.image = config.getImage("personnage") #image du personnage
-		self.image = pygame.transform.scale(self.image, self.dimension) #redimensionne l'image du personnage
+		
+		self.image_b = config.getImage("personnage b") #image du personnage
+		self.image_b = pygame.transform.scale(self.image_b, self.dimension) #redimensionne l'image du personnage
+		
+		self.image_h = config.getImage("personnage h") #image du personnage
+		self.image_h = pygame.transform.scale(self.image_h, self.dimension) #redimensionne l'image du personnage
+		
+		self.image_d = config.getImage("personnage d") #image du personnage
+		self.image_d = pygame.transform.scale(self.image_d, self.dimension) #redimensionne l'image du personnage
+		
+		self.image_g = config.getImage("personnage g") #image du personnage
+		self.image_g = pygame.transform.scale(self.image_g, self.dimension) #redimensionne l'image du personnage
 
+		self.image = self.image_b
+		
 		self._notif = None #creation des futures notification pour le personnage
 
 	def update(self):
@@ -143,15 +155,19 @@ class Personnage(Character):
 
 	def gauche(self): #permet de bouget vers gauche
 		self.vx = -1
+		self.image = self.image_g
 
 	def droite(self): #permet de bouget vers droite
 		self.vx = 1
+		self.image = self.image_d
 
 	def bas(self): #permet de bouget vers bas
 		self.vy = 1
+		self.image = self.image_b
 
 	def haut(self): #permet de bouget vers haut
 		self.vy = -1
+		self.image = self.image_h
 
 # =============================================== OBJET IMMOBILE ======================================================
 

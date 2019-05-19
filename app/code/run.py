@@ -24,7 +24,7 @@ fond = pygame.Surface(taille) #creation d'un fond
 
 config.init() #initialisation de la config (pour les images)
 
-debug = config_dic["debug"]
+debug = config_dic["debug"] #permet d'activer le debug mode
 
 #========================================== FONCTION D'EVENT ================================================
 def objetEvent():
@@ -53,21 +53,11 @@ def timerEvent(app):
                 print("TIME'S UP") #debug
                 app.game_over(app.ecran.environnement.get_nombre_de_lvl()) #affiche le game over (avec le score)
 
-#########################################
-#           fichier sonor	        #
-#########################################
-'''
-mixer.init()
-music = mixer.Sound("../music/Thunderstorm.wav")
-son = mixer.Sound("../music/bruitage1.wav")'''
-
-
-
 # ========================================= BOUCLE PRINCIPALE ===========================================
 
 key_trad = {"a": 113, "z":119, "d":100, "q":97, "s":115} # traduction unicode et n° key
 
-pic = objet.Pic((200, 200), (100, 100)) #initialise les pics (wtf)
+pic = objet.Pic((200, 200), (100, 100)) #initialise les pics
 
 app = application.Application() #initialise l'application qui gere les differents menus
 app.start() #demarre l'application
@@ -75,9 +65,9 @@ app.start() #demarre l'application
 clock = pygame.time.Clock() #initialise un horloge
 pygame.time.set_timer(USEREVENT, 1000) #creation d'un event de temps toute les secondes (utile pour le compte a rebour)
 
-pygame.display.set_caption("Under the infinite dungeon") #Cahnge le nom de la fenetre
+pygame.display.set_caption("Under the infinite dungeon") #Change le nom de la fenetre
 
-boucle = True #petmet le fonctionnement de la boucle principale
+boucle = True #permet le fonctionnement de la boucle principale
 
 while boucle:	 
     clock.tick(config_dic["fps"]) #definie le nombre de frame max par seconde (fps)
@@ -103,7 +93,7 @@ while boucle:
        # music.stop()          #lorsque le joueur est dans le menu pas de musique
 
     ''' boucle game over '''
-    if application.check_statut_game_over(app):
+    if application.check_statut_game_over(app): #voir fichier application
         fond = config.getImage("fond game over")	#recuperation de l'image du fond menu
         fond = pygame.transform.scale(fond, taille) #redimension de l'image
         fenetre.blit(fond, (0, 0)) # on colle le fond
