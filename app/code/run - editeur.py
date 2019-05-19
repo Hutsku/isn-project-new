@@ -26,15 +26,16 @@ fond.fill((100, 100, 100)) # on colorie en gris
 # ================================================================================================
 
 class Editeur():
+	''' Gère l'éditeur de manière générale '''
 	def __init__(self, width, height):
 		self.width = width
 		self.height = height
-		self.taille_case = config.getConfig()["taille_case"]
-		self.nb_case = config.getConfig()["nb_case"]
+		self.taille_case = config.getConfig()["taille_case"] # Taille des cases du niveau
+		self.nb_case = config.getConfig()["nb_case"] # Nombre de case par ligne
 
-		self.niveau = niveau = dongeon.Niveau("../niveau/exemple/blank_level.txt")
-		self.type_case = "mur"
-		self.type_mode = "selection"
+		self.niveau = niveau = dongeon.Niveau("../niveau/exemple/blank_level.txt") # on génère un niveau vide
+		self.type_case = "mur" # Type de case d'édition par défaut
+		self.type_mode = "selection" # Type de clique par défaut
 		self.case_selection = None
 		self.case_selection_cible = []
 
@@ -59,11 +60,14 @@ class Editeur():
 		''' Variable pour le personnage, seulement en mode test '''
 		self.perso = None 
 
-		self._init_editeur()
+		self._init_editeur() # On initalise l'éditeur
 
 	# ================================== EDITION NIVEAU =============================
 
 	def _init_editeur(self):
+		''' Construit tout les éléments necessaires à l'éditeur '''
+
+		''' On dessine un quadrillage '''
 		for x in range(self.nb_case):
 			pygame.draw.line(fond, (0, 0, 0), (x*self.taille_case+self.taille_case, 0), (x*self.taille_case+self.taille_case, self.height))
 			pygame.draw.line(fond, (0, 0, 0), (0, x*self.taille_case+self.taille_case), (self.height, x*self.taille_case+self.taille_case))
@@ -105,6 +109,7 @@ class Editeur():
 		widget.ImageButton((170, 90), size=(30, 30), action=(self.change_type, "interrupteur timer"), path="../image/interrupteur_off.png", frame=frame3)
 		widget.ImageButton((210, 10), size=(30, 30), action=(self.change_type, "bonus"), path="../image/bonus.png", frame=frame3)
 
+		''' On construit enfin le niveau actuel '''
 		self.build_level()
 
 	def build_level(self):
@@ -147,7 +152,7 @@ class Editeur():
 			x += 1
 
 	def delete_level(self):
-		'''on détruit le niveau actuel'''
+		''' Détruit le niveau actuel'''
 		for case in objet.Objet.liste:
 			case.kill()
 
@@ -157,9 +162,10 @@ class Editeur():
 		pos_y = math.floor(y/self.taille_case)
 		position = (pos_x*self.taille_case, pos_y*self.taille_case)
 
-		self.supp_case(x, y, replace=True)
+		self.supp_case(x, y, replace=True) # Supprime l'ancienne case (en precisant qu'on la remplace après)
 		self.niveau.coord["terrain"][pos_x][pos_y]["type"] = self.type_case
 
+		''' On construit sur le niveau l'élément selectionné '''
 		if self.type_case == "mur":
 			objet.Mur(position, (self.taille_case, self.taille_case))
 		elif self.type_case == "eau":
@@ -170,7 +176,7 @@ class Editeur():
 			objet.Sol(position, (self.taille_case, self.taille_case))
 		elif self.type_case == "spawn":
 			self.niveau.spawn = (pos_x, pos_y)
-			objet.SolSpawn(position, (self.taille_case, self.taille_case)) # une simple case Sol rouge
+			objet.SolSpawn(position, (self.taille_case, self.taille_case))
 		elif self.type_case == "fin":
 			objet.Escalier(position, (self.taille_case, self.taille_case))
 		elif self.type_case == "porte":
@@ -205,6 +211,8 @@ class Editeur():
 		_objet = pygame.sprite.Sprite() # on crée un point correspondant au clique de la souris
 		_objet.rect = pygame.Rect((x, y), (1, 1))
 		response = pygame.sprite.spritecollideany(_objet, objet.Objet.liste)
+
+		''' L'élément qui était là est supprimé '''
 		if response:
 			response.kill()
 
@@ -219,12 +227,13 @@ class Editeur():
 		pos_y = math.floor(y/self.taille_case)
 		type_case = self.niveau.coord["terrain"][pos_x][pos_y]["type"]
 
-		self.case_selection = [pos_x, pos_y]
+		self.case_selection = [pos_x, pos_y] # On stocke la position de la case selectionnée
 
 		cible=None
 		if type_case in ["porte", "interrupteur", "interrupteur timer", "pic interrupteur"]:
-			cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"]
+			cible = self.niveau.coord["terrain"][pos_x][pos_y]["cible"] # On modifie le dictionnaire
 
+		''' On modifie ensuite les infos de l'interface '''
 		self.select_case_info(type_case, cible=cible)
 
 	def select_case_info(self, type_case, cible=None):
@@ -232,6 +241,7 @@ class Editeur():
 		if not cible:
 			cible = []
 
+		''' Change le texte et l'image '''
 		self.widg_label_case.change_text(text=type_case)
 		self.widg_image_case.change_image(image=config.getImage(type_case))
 
@@ -269,19 +279,22 @@ class Editeur():
 				self.case_selection_cible.append([pos_x, pos_y])
 
 	def supp_case_cible(self, x, y):
+		''' Enlève la case des cibles selectionnées '''
 		pos_x = math.floor(x/self.taille_case)
 		pos_y = math.floor(y/self.taille_case)
 		case_cible = self.niveau.coord["terrain"][pos_x][pos_y]
 
+		''' On supprime le lien entre mecanisme vers interrupteur '''
 		if [pos_x, pos_y] in self.case_selection_cible:
 			self.case_selection_cible.remove([pos_x, pos_y])
 
-			''' on supprime ensuite le lien dans l'autre sens de la cible vers mecanisme '''
-			if case_cible["type"] == "interrupteur" or case_cible["type"] == "porte":
-				if self.case_selection in case_cible["cible"]:
-					case_cible["cible"].remove(self.case_selection)
+		''' on supprime ensuite le lien dans l'autre sens de la cible vers mecanisme '''
+		if case_cible["type"] == "interrupteur" or case_cible["type"] == "porte":
+			if self.case_selection in case_cible["cible"]:
+				case_cible["cible"].remove(self.case_selection)
 
 	def valider_cible(self):
+		''' Valide et stocke les éléments cibles '''
 		(x, y) = self.case_selection
 		case = self.niveau.coord["terrain"][x][y]
 
@@ -296,6 +309,7 @@ class Editeur():
 		self.widg_button_cible.change_text(text="Selectionner cibles")
 		self.widg_button_cible.action = (self.change_mode, "selection cible")
 
+		''' On change le mode de clique '''
 		self.case_selection_cible = []
 		self.type_mode = "selection"
 
@@ -404,6 +418,8 @@ class Editeur():
 		print("save")
 		lien = "../niveau/"+self.widg_entry.text+".txt"
 		dic = {"spawn": self.niveau.spawn, "terrain":self.niveau.coord["terrain"]}
+
+		''' On enregistre le dico dans un fichier en JSON '''
 		with open(lien, "w") as fichier:
 			json_dic = json.dumps(dic)
 			fichier.write(json_dic)
@@ -412,14 +428,16 @@ class Editeur():
 		'''Charge une map '''
 		print("load")
 		lien = "../niveau/"+self.widg_entry.text+".txt"
+
+		''' On lit le fichier JSON '''
 		with open(lien, "r") as fichier:
 			json_dic = fichier.read()
 			dic = json.loads(json_dic)
 
 			self.niveau.spawn = dic["spawn"]
 			self.niveau.coord["terrain"] = dic["terrain"]
-			self.delete_level()
-			self.build_level()
+			self.delete_level() # On détruit l'ancien niveau ...
+			self.build_level() # ... et on crée le nouveau !
 
 	def reset_level(self):
 		''' Charge la map de base '''
@@ -437,11 +455,13 @@ class Editeur():
 # ========================================== FONCTIONS ===========================================
 
 def objetEvent():
+	''' Gère les Event des objets '''
 	objet.move() # On actualise la position des objets sur l'écran (collision etc)
 	objet.hitbox() # on test les hitbox des sprites entre eux (dégat et trigger)
 	objet.update() # on affiche les sprites à l'écran
 
 # ===================================== BOUCLE PRINCIPALE ========================================
+# =========================== Similaire à celle du programme principale ==========================
 
 editeur = Editeur(taille_editeur, taille_level)
 key_trad = {"a": 113, "z":119, "d":100, "q":97, "s":115} # traduction unicode et n° key

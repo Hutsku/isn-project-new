@@ -11,6 +11,7 @@ import objet
 import config
 
 #========================================== FONCTION CHECK ==============================================================
+
 def check_fin_niveau(dongeon_actuel): #verifie si c'est la fin du niveau
 	for escalier in objet.Escalier.liste: #verifie si le perso est sur l'un des escalier de la liste
 		if escalier.statut:
@@ -37,7 +38,7 @@ class Dongeon ():
 		taille_personnage = config.getConfig()["taille_personnage"] #recupere la taille du perso jouable
 		spawn = (self.niveau.spawn[0]*taille_case, self.niveau.spawn[1]*taille_case) #definie le lieu de spawn
 
-		#permet la construction de tout les elements colonne par colonne
+		''' Construit les éléments du niveaux'''
 		x=0
 		for a in self.niveau.coord["terrain"]:
 			y=0
@@ -135,6 +136,7 @@ class Dongeon ():
 	def get_temps(self):
 		'''renvoit le temps actuelle'''
 		return self.timer
+		
 	# ================================== PARAMETRE NIVEAU ============================
 
 	def change_level(self, lien_niveau=""):

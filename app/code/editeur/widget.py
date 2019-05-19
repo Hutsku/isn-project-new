@@ -1,6 +1,7 @@
 # coding: utf-8
 
 #========================================== IMPORT FICHIERS NECESSAIRES ================================================
+
 import pygame
 from pygame.locals import *
 import time

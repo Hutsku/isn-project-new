@@ -6,20 +6,26 @@ from pygame.locals import *
 import config
 import editeur.widget as widget
 		
+# /!\  ========================================= AVIS SUR LES COMMENTAIRES ======================================== /!\ 
+
+''' Les classes se ressemblant beaucoup les une des autres et étant hierarchisées, les commentaires décrivant l'action 
+des attrributs et fonctions ne se feront que dans la classe mère si possible '''
+
 # ======================================================== CLASSE MERE ================================================
 
 class Objet(pygame.sprite.Sprite):
-	liste = pygame.sprite.Group() #creation de la liste relative au objet
+	''' Classe basique pour chaque élément du jeu '''
+	liste = pygame.sprite.Group() # Liste de toute les objets de cette classe
 	def __init__(self, position, dimension):
 		super().__init__()
-		Objet.liste.add(self) #s'ajoute a la liste
+		Objet.liste.add(self) # S'ajoute à la liste
 
-		self.image = pygame.Surface(dimension) #image de l'objet
-		self.rect = self.image.get_rect() #dimension de l'image
-		self.rect.topleft = position #position de l'objet
-		self.size = dimension #dimension de l'objet
+		self.image = pygame.Surface(dimension) # image de l'objet
+		self.rect = self.image.get_rect() # dimension de l'image
+		self.rect.topleft = position # position de l'objet
+		self.size = dimension # dimension de l'objet
 
-		self.hitbox = None #definie si l'objet doit avoir une hitbox
+		self.hitbox = None # Definie si l'objet doit avoir une hitbox
 
 	def update(self):
 		''' Affiche le sprite sur l'écran '''
@@ -28,13 +34,11 @@ class Objet(pygame.sprite.Sprite):
 # ======================================================= OBJET MOBILE ================================================
 
 class Character(Objet):
-	'''permet la creation d'un personnage qui bouge (jouable ou non)'''
-	
-	liste = pygame.sprite.Group() #creation de la liste relative au personnage
-	
+	'''Permet la creation d'un personnage qui bouge (jouable ou non)'''
+	liste = pygame.sprite.Group()
 	def __init__ (self, position, dimension):
 		super().__init__(position, dimension)
-		Character.liste.add(self) #s'ajoute a la liste
+		Character.liste.add(self)
 
 		self.speed = 1 # Coef de vitesse
 
@@ -45,23 +49,26 @@ class Character(Objet):
 		self.vx = 0
 		self.vy = 0
 
-		self.hitbox = self.rect #definition de sa hitbox
+		self.hitbox = self.rect # Sa hitbox correspond à sa taille
 		self.frame_invincibilite = config.getConfig()["incinvibility"] # nb de frame avant qu'une autre attaque puisse le toucher
 		self._frame_time = 0 # False si le timer est reset, sinon ce sera le nb de frame qu'il reste 
 		
 		self.temps_additionel = 0 # valeur temporaire de bonus ou malus de temps
 
 	def move(self, coord=None):
-		''' Actualise la position de l'objet, selon ses vecteurs de vitesse '''
+		''' Actualise la position de l'objet, selon ses vecteurs de vitesse et sa position '''
+
+		''' Si des positions sont données, alors on bouge simplement le personnage à la destination '''
 		if coord:
 			self.rect.topleft = coord
 			(self.px, self.py) = coord
-			
 			return
 
+		''' Sa vitesse effective correspond à la vitesse qui lui ai donnée et à ses vecteurs de vitesse '''
 		vx = self.vx * self.speed
 		vy = self.vy * self.speed
 
+		''' On crée un "fantôme" à la destination cible '''
 		fantome = self.rect.copy()
 		fantome.x += vx
 		fantome.y += vy
@@ -74,6 +81,7 @@ class Character(Objet):
 			if not porte.statut: # si la porte est fermée
 				liste_collision_porte_ferme.append(porte) # Si une porte est fermée, on comptabilise la collision
 
+		''' Si le "fantôme" n'as pas de collision, on le remplace par le personnage '''
 		if (not liste_collision_mur) and (not liste_collision_porte_ferme):
 			self.px += vx # on enregistre la position en float ...
 			self.py += vy
@@ -88,7 +96,7 @@ class Character(Objet):
 		if self._frame_time:
 			self._frame_time -= 1
 
-		super().update()
+		super().update() # on appelle la fonction update de sa classe mère (ici Objet)
 
 	def degat(self, valeur):
 		''' Inflige un malus de temps '''
@@ -109,15 +117,15 @@ class Character(Objet):
 		return temps
 
 class Personnage(Character):
+	''' Permet la création d'un personnage controllable '''
 	liste = pygame.sprite.Group()
-	'''creation du personnage jouable'''
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
 		Personnage.liste.add(self)
 
 		dim = dimension[1] #recupere la dimension du personnage 
 		dim = int(dim) #transforme la dimension en nombre entier
-		self.dimension = (dim, dim) # recreer la dimension du personnage sous forme (x,y)
+		self.dimension = (dim, dim) # recree la dimension du personnage sous forme (x,y)
 		self.speed = 3 #vitesse du personnage
 		
 		self.image_b = config.getImage("personnage b") #image du personnage
@@ -134,133 +142,142 @@ class Personnage(Character):
 
 		self.image = self.image_b
 		
-		self._notif = None #creation des futures notification pour le personnage
+		self._notif = None # creation des futures notification pour le personnage
 
 	def update(self):
-		'''permet l'affichege des notifs'''
+		'''Permet l'affichege des notifs'''
 		if self._notif:
 			self._notif.rect.center = (self.rect.centerx, self.rect.y-20)
 
-		super().update() # on appelle update() de Widget
+		super().update()
 
 	def notif(self, text): 
-		'''creer le texte de notification'''
+		'''Crée le texte de notification'''
 		self._notif = widget.Label(self.rect.topleft, size=(200, 20), text=text, color=[0, 0, 0, 0], centered=True, bold=True)
 		self._notif.rect.center = (self.rect.centerx, self.rect.y-20)
 
 	def supp_notif(self):
-		'''suprime le texte de notification'''
+		'''Supprime le texte de notification'''
 		self._notif.kill()
 		self._notif = None
 
-	def gauche(self): #permet de bouget vers gauche
+	def gauche(self):
+		''' Permet de bouget vers la gauche'''
 		self.vx = -1
 		self.image = self.image_g
 
-	def droite(self): #permet de bouget vers droite
+	def droite(self):
+		''' Permet de bouget vers la droite'''
 		self.vx = 1
 		self.image = self.image_d
 
-	def bas(self): #permet de bouget vers bas
+	def bas(self):
+		''' Permet de bouget vers le bas'''
 		self.vy = 1
 		self.image = self.image_b
 
-	def haut(self): #permet de bouget vers haut
+	def haut(self):
+		''' Permet de bouget vers le haut'''
 		self.vy = -1
 		self.image = self.image_h
 
 # =============================================== OBJET IMMOBILE ======================================================
 
 class Sol(Objet):
-	'''creation des sols'''
-	liste = pygame.sprite.Group() #creation de la liste relative aux sols
+	'''Creation des sols'''
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
-		Sol.liste.add(self) #s'ajoute a la liste des sols
+		Sol.liste.add(self)
 
 		self.image = config.getImage("sol") #recuperation de l'image du sol
 		self.image = pygame.transform.scale(self.image, dimension) #redimension de l'image
 
 class Mur(Objet):
-	'''creation des murs'''
-	liste = pygame.sprite.Group() #creation de la liste relative aux murs
+	'''Creation des murs'''
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension): 
 		super().__init__(position, dimension)
-		Mur.liste.add(self) #s'ajoute a la liste des sols
+		Mur.liste.add(self)
 
 		self.image = config.getImage("mur") #recuperation de l'image du mur
 		self.image = pygame.transform.scale(self.image, dimension)#redimension de l'image
 
 class Eau(Mur):
-	liste = pygame.sprite.Group() #creation de la liste relative a l'eau
+	''' Permet la création d'une case d'eau (infranchissable) '''
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
-		Eau.liste.add(self) #s'ajoute a la liste de l'eau
+		Eau.liste.add(self)
 
-		self.image = config.getImage("eau") #recuperation de l'image de l'eau
-		self.image = pygame.transform.scale(self.image, dimension)#redimension de l'image
+		self.image = config.getImage("eau")
+		self.image = pygame.transform.scale(self.image, dimension)
 
 class Vide(Mur):
-	liste = pygame.sprite.Group() #creation de la liste relative au vide
+	''' Permet la création d'une case de vide (infranchissable) '''
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
-		Vide.liste.add(self) #s'ajoute a la liste du vide
+		Vide.liste.add(self)
 
-		self.image = config.getImage("vide") #recuperation de l'image du vide
-		self.image = pygame.transform.scale(self.image, dimension)#redimension de l'image
+		self.image = config.getImage("vide")
+		self.image = pygame.transform.scale(self.image, dimension)
 
 # ================================================ PORTE / INTERRUPTEUR ===============================================
 
 class Porte(Objet):
 	''' Porte pouvant tour à tour être ouverte ou fermée '''
-	liste = pygame.sprite.Group() #creation de la liste relative aux portes
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
-		Porte.liste.add(self) #s'ajoute a la liste des portes
+		Porte.liste.add(self)
 
 		self.image.fill((0, 200, 0))
 		self.statut = False # False => porte fermée
 
 class Interrupteur(Objet):
 	''' Interrupteur permettant d'activer un mecanisme / porte '''
-	liste = pygame.sprite.Group() #creation de la liste relative aux interrupteurs
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension, cible=None):
 		super().__init__(position, dimension)
-		Interrupteur.liste.add(self) #s'ajoute a la liste des interrupteurs
-		self.dimension = dimension #dimension de l'interrupteur
+		Interrupteur.liste.add(self)
 
-		self.image = config.getImage("interrupteur") #recuperation de l'image des interrupteur (position off)
-		self.image = pygame.transform.scale(self.image, dimension) #redimension de l'image
+		self.dimension = dimension
+
+		self.image = config.getImage("interrupteur")
+		self.image = pygame.transform.scale(self.image, dimension)
 
 		self.cible = cible #permet de donner l'objet qu'il active
 		self.statut = False #False => interrupteur non activé
 
-		self.hitbox = self.rect.copy()	#donne l'hitbox de l'interrupteur
+		self.hitbox = self.rect.copy()
 
 	def action(self, cible=None):
-		'''fait les action lié a son activation'''
+		'''Fait les action lié a son activation'''
 		self.statut =  not self.statut
 
+		''' Si on a une liste de cible ...'''
 		if type(self.cible) == type([]): 
 			for cible in self.cible:
 				cible.action() #fait l'action de l'objet lié
-				if self.statut:  #dans le cas d'activation
-					self.image = config.getImage("interrupteur on") #recuperation de l'image des interrupteur (position on)
-					self.image = pygame.transform.scale(self.image, self.dimension) #redimension de l'image
-				if self.statut == False: #dans le cas de desactivation
-					self.image = config.getImage("interrupteur") #recuperation de l'image des interrupteur (position off)
-					self.image = pygame.transform.scale(self.image, self.dimension) #redimension de l'image
+				if self.statut:  # Image -> position on
+					self.image = config.getImage("interrupteur on")
+					self.image = pygame.transform.scale(self.image, self.dimension)
+				if self.statut == False: # Image -> position off
+					self.image = config.getImage("interrupteur")
+					self.image = pygame.transform.scale(self.image, self.dimension)
+
 		elif self.cible:
 			self.cible.action()
-			self.image = config.getImage("interrupteur") #recuperation de l'image des interrupteur (position off)
-			self.image = pygame.transform.scale(self.image, self.dimension) #redimension de l'image
+			self.image = config.getImage("interrupteur") # Image -> position off
+			self.image = pygame.transform.scale(self.image, self.dimension)
 
 class InterrupteurTimer(Interrupteur):
 	''' Interrupteur a temps permettant d'activer un mecanisme / porte '''
-	liste = pygame.sprite.Group() #creation de la liste relative aux interrupteurs a temps
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension, cible=[]):
 		super().__init__(position, dimension, cible=cible)
-		InterrupteurTimer.liste.add(self) #s'ajoute a la liste des interrupteurs a temps
+		InterrupteurTimer.liste.add(self)
 
 		self.frame_activation = 500 # nb de frame de l'activation
 		self._frame_time = 0 # timer
@@ -272,41 +289,43 @@ class InterrupteurTimer(Interrupteur):
 		elif self.statut:
 			self.action() #permet de faire l'action
 
-		super().update() #permet de actualiser les images a l'ecran
+		super().update()
 
 	def action(self, cible=None):
 		self.statut = not self.statut
 
+		''' Si on a plusieurs cibles ...'''
 		if type(self.cible) == type([]):
 			for cible in self.cible:
 				cible.action()
-				if self.statut: #dans le cas d'activation
-					self.image = config.getImage("interrupteur on") #recuperation de l'image des interrupteur (position on)
-					self.image = pygame.transform.scale(self.image, self.dimension) #redimension de l'image
+				if self.statut: # Image -> position on
+					self.image = config.getImage("interrupteur on")
+					self.image = pygame.transform.scale(self.image, self.dimension)
 					self._frame_time = self.frame_activation # On active le timer
-				if not self.statut: #dans le cas de desactivation
-					self.image = config.getImage("interrupteur") #recuperation de l'image des interrupteur (position off)
-					self.image = pygame.transform.scale(self.image, self.dimension) #redimension de l'image
-					self._frame_time = 0 #remise a 0 du timer
+				if not self.statut: # Image -> position off
+					self.image = config.getImage("interrupteur")
+					self.image = pygame.transform.scale(self.image, self.dimension)
+					self._frame_time = 0 # remise a 0 du timer
+
 		elif self.cible:
-			if self.statut:
-				self.image = config.getImage("interrupteur on") #recuperation de l'image des interrupteur (position on)
-				self.image = pygame.transform.scale(self.image, self.dimension) #redimension de l'image
+			if self.statut: # Image -> position on
+				self.image = config.getImage("interrupteur on")
+				self.image = pygame.transform.scale(self.image, self.dimension)
 				self._frame_time = self.frame_activation # On active le timer
-			if not self.statut:
-				self.image = config.getImage("interrupteur") #recuperation de l'image des interrupteur (position off)
-				self.image = pygame.transform.scale(self.image, self.dimension) #redimension de l'image
+			if not self.statut: # Image -> position off
+				self.image = config.getImage("interrupteur")
+				self.image = pygame.transform.scale(self.image, self.dimension)
 				self._frame_time = 0#remise a 0 du timer
 
 class PorteInterrupteur(Porte):
 	''' Porte qui s'ouvre à l'aide d'un interrupteur '''
-	liste = pygame.sprite.Group() #creation de la liste relative aux porte a interrupteur 
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension, interrupteur=[]):
 		super().__init__(position, dimension)
-		PorteInterrupteur.liste.add(self) #s'ajoute a la liste des portes a interrupteur
+		PorteInterrupteur.liste.add(self)
 
-		self.image = config.getImage("porte") #recuperation de l'image des portes
-		self.image = pygame.transform.scale(self.image, dimension) #redimension de l'image
+		self.image = config.getImage("porte")
+		self.image = pygame.transform.scale(self.image, dimension) 
 		self.interrupteur = interrupteur #donnes les infos des interrupteurs liés
 
 	def action(self, cible=None):
@@ -318,28 +337,28 @@ class PorteInterrupteur(Porte):
 					all_activated = False
 
 			if all_activated: # on regarde s'ils sont tous activés et on ouvre la porte
-				if not self.statut: #cas d'ouverture
-					self.image = config.getImage("sol") #recuperation de l'image des sols
-					self.image = pygame.transform.scale(self.image, self.size) #redimension de l'image
+				if not self.statut:# Image -> position ouverte
+					self.image = config.getImage("sol") 
+					self.image = pygame.transform.scale(self.image, self.size) 
 				self.statut = True
 			else: #sinon on la ferme
-				if self.statut:  #cas de fermeture
-					self.image = config.getImage("porte") #recuperation de l'image des portes
-					self.image = pygame.transform.scale(self.image, self.size) #redimension de l'image
+				if self.statut:  # Image -> position fermée
+					self.image = config.getImage("porte") 
+					self.image = pygame.transform.scale(self.image, self.size)
 				self.statut = False
 
 # ==================================================== PIEGES =========================================================
 
 class Pic(Sol):
-	'''pic traversable mais qui donne des degats'''
-	liste = pygame.sprite.Group() #creation de la liste relative aux pics
+	'''pic traversable mais qui inflige des degats'''
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
-		Pic.liste.add(self) #s'ajoute a la liste des pics
+		Pic.liste.add(self)
 
-		self.image = config.getImage("pic") #recuperation de l'image des pics
-		self.image = pygame.transform.scale(self.image, dimension) #redimension de l'image
-		self.hitbox = self.rect.copy() #defini la hitbox
+		self.image = config.getImage("pic")
+		self.image = pygame.transform.scale(self.image, dimension)
+		self.hitbox = self.rect.copy()
 
 		self.degat = config.getConfig()["degat_pics"] #definition des degats des pics
 
@@ -350,12 +369,13 @@ class Pic(Sol):
 				objet.degat(self.degat)
 
 class PicInterrupteur(Pic):
-	liste = pygame.sprite.Group() #creation de la liste relative aux pics a intertupteurs
+	''' Pics activable par un interrupteur '''
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension, interrupteur=[]):
 		super().__init__(position, dimension)
-		PicInterrupteur.liste.add(self) #s'ajoute a la liste des pics a interrupteurs
+		PicInterrupteur.liste.add(self)
 
-		self.interrupteur = interrupteur #recupere les données des interrupteurs liés
+		self.interrupteur = interrupteur 
 
 	def action(self, cible=None):
 		''' Ouvre ou ferme les pics'''
@@ -367,23 +387,24 @@ class PicInterrupteur(Pic):
 						all_activated = False
 
 				if all_activated: # on regarde s'ils sont tous activés et on desactive les pics
-					self.image = config.getImage("pic off") #recuperation de l'image des pics desactivés
-					self.image = pygame.transform.scale(self.image, self.size) #redimension de l'image
+					self.image = config.getImage("pic off")
+					self.image = pygame.transform.scale(self.image, self.size)
 					self.hitbox = None #desactive la hitbox (pour plus avoir de degats)
 				else:
-					self.image = config.getImage("pic") #recuperation de l'image des pics
-					self.image = pygame.transform.scale(self.image, self.size) #redimension de l'image
+					self.image = config.getImage("pic")
+					self.image = pygame.transform.scale(self.image, self.size)
 					self.hitbox = self.rect.copy() #reactive la hitbox
 					
 		super().action(cible)
 
 class PicIntervalle(Pic):
-	liste = pygame.sprite.Group() #creation de la liste relative aux pics a intertupteurs
+	''' Pics s'enclanchant à intervalle regulier '''
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
-		PicIntervalle.liste.add(self) #s'ajoute a la liste des pics a interrupteurs
+		PicIntervalle.liste.add(self)
 
-		self.frame_activation = config.getConfig()["intervalle_pics"] # temps  de frame entre chaque état du pic
+		self.frame_activation = config.getConfig()["intervalle_pics"] # temps de frame entre chaque état du pic
 		self._frame_time = self.frame_activation # timer d'activation
 
 	def update(self):
@@ -394,54 +415,54 @@ class PicIntervalle(Pic):
 		''' Quand timer à 0: On met à jour l'image et l'etat du pic '''
 		if not self._frame_time:
 			if self.hitbox:
-				self.image = config.getImage("pic off") #recuperation de l'image des pics desactivés
-				self.image = pygame.transform.scale(self.image, self.size) #redimension de l'image
+				self.image = config.getImage("pic off")
+				self.image = pygame.transform.scale(self.image, self.size)
 				self.hitbox = None #desactive la hitbox (pour plus avoir de degats)
 			else:
-				self.image = config.getImage("pic") #recuperation de l'image des pics
-				self.image = pygame.transform.scale(self.image, self.size) #redimension de l'image
+				self.image = config.getImage("pic")
+				self.image = pygame.transform.scale(self.image, self.size)
 				self.hitbox = self.rect.copy() #reactive la hitbox
 
 			self._frame_time = self.frame_activation #reset du timer
 
 
-		super().update() #met a jour les image
+		super().update()
 
 class Lave(Pic):
 	'''creation de la lave traversable mais a degat (=pic)'''
-	liste = pygame.sprite.Group() #creation de la liste relative a la lave
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
-		Lave.liste.add(self) #s'ajoute a la liste de la lave
+		Lave.liste.add(self)
 
-		self.image = config.getImage("lave") #recuperation de l'image de la lave
-		self.image = pygame.transform.scale(self.image, dimension) #redimension de l'image
-		self.hitbox = self.rect.copy() #definie sa hitbox
+		self.image = config.getImage("lave")
+		self.image = pygame.transform.scale(self.image, dimension)
+		self.hitbox = self.rect.copy()
 
-		self.degat = config.getConfig()["degat_lave"] #degat de la lave
+		self.degat = config.getConfig()["degat_lave"]
 
 # ===================================================== AUTRES ========================================================
 
 class SolSpawn(Sol):
-	'''case de spawn (editeur uniquement'''
-	liste = pygame.sprite.Group() #creation de la liste relative au spawn
+	'''case de spawn (editeur uniquement)'''
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
-		SolSpawn.liste.add(self) #s'ajoute a la liste de la lave
+		SolSpawn.liste.add(self)
 
-		self.image = config.getImage("spawn") #recuperation de l'image du spawn
-		self.image = pygame.transform.scale(self.image, dimension) #redimension de l'image
+		self.image = config.getImage("spawn")
+		self.image = pygame.transform.scale(self.image, dimension)
 
 class Escalier(Sol):
-	'''case de fin de niveau'''
-	liste = pygame.sprite.Group() #creation de la liste relative a l'escalier
+	'''Case de fin de niveau'''
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
-		Escalier.liste.add(self) #s'ajoute a la liste de a l'escalier
+		Escalier.liste.add(self)
 
-		self.image = config.getImage("fin") #recuperation de l'image de fin
-		self.image = pygame.transform.scale(self.image, dimension) #redimension de l'image
-		self.hitbox = self.rect.copy() #donne l'hitbox
+		self.image = config.getImage("fin")
+		self.image = pygame.transform.scale(self.image, dimension)
+		self.hitbox = self.rect.copy()
 
 		self.statut = False #True => fin du niveau
 
@@ -450,17 +471,17 @@ class Escalier(Sol):
 		self.statut = True
 
 class Bonus(Sol):
-	'''case de bonus'''
-	liste = pygame.sprite.Group() #creation de la liste relative aux bonus
+	'''case de bonus de temps'''
+	liste = pygame.sprite.Group()
 	def __init__(self, position, dimension):
 		super().__init__(position, dimension)
-		Bonus.liste.add(self) #s'ajoute a la liste aux bonus
+		Bonus.liste.add(self)
 
-		self.image = config.getImage("bonus") #recuperation de l'image du bonus
-		self.image = pygame.transform.scale(self.image, dimension) #redimension de l'image
-		self.hitbox = self.rect.copy() #donne l'hitbox
+		self.image = config.getImage("bonus")
+		self.image = pygame.transform.scale(self.image, dimension)
+		self.hitbox = self.rect.copy()
 
-		self.bonus = config.getConfig()["bonus"] #donne un bonus de temps
+		self.bonus = config.getConfig()["bonus"]
 
 	def action(self, cible):
 		''' Ajoute un bonus '''
@@ -491,13 +512,13 @@ def update():
 	for objet in Bonus.liste: #bonus
 		objet.update()	
 
-	for objet in Character.liste: #tous les personnages
+	for objet in Character.liste: #tous les personnages (1 seul)
 		objet.update()
 
 def move():
 	''' Actualise la position des objets '''		
 	for objet in Character.liste:
-		objet.move()
+		objet.move() # Lance la fonction move() de chaque objet
 
 def hitbox(groupe=Sol.liste):
 	''' On check si les hitbox des sprites interragissent avec certains objets 
