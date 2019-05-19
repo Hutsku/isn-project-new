@@ -68,7 +68,7 @@ app.start()
 clock = pygame.time.Clock()
 pygame.time.set_timer(USEREVENT, 1000)
 
-light = pygame.image.load('../image/light.png').convert_alpha()
+light = pygame.image.load('../image/FX/light.png').convert_alpha()
 light = pygame.transform.scale(light, (200, 200))
 brouillard = pygame.surface.Surface((config_dic["taille_level"], config_dic["taille_level"])).convert()
 
