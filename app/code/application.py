@@ -58,8 +58,8 @@ class Game_over :
                 font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(0, 255, 0)) # Bouton "REJOUER"
         self.widg_menu = widget.Button((x, 2*y), size=(width, height), text="MENU", action=application.menu, 
                 font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(255, 0, 0)) # Bouton "MENU"
-        self.widg_score = widget.Label((0.75*x,1.5*y), size=(2*width, height), ext="Score de la partie: " + score, 
-            text_color = (200,200,200), font="Razer Regular", centered=True, police=26, bold=True, color = (0,0,0,0)) # affichage du score
+        self.widg_score = widget.Label((0.75*x,1.5*y), size=(2*width, height), text="Score de la partie: " + score, 
+                text_color = (200,200,200), font="Razer Regular", centered=True, police=26, bold=True, color = (0,0,0,0)) # affichage du score
 
         fond = config.getImage("fond game over") # recuperation de l'image du fond menu
         fond = pygame.transform.scale(fond, taille_ecran) # redimension de l'image
