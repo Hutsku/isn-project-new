@@ -3,12 +3,14 @@
 #========================================== IMPORT FICHIERS NECESSAIRES ================================================
 import pygame
 from pygame.locals import *
+import os
 
 import config
 import editeur.widget as widget
 import objet
 import dongeon
 import hud
+import json
 
 #========================================== IMPORT CONFIG =============================================================
 
@@ -49,7 +51,9 @@ class Game_over :
         for  widg in widget.Widget.group: 
             widg.kill()
 			
+        record_score = self.meilleur_score(score)
         score = str(score)
+
         width = 200
         height = 50
         x = taille_ecran[0]/2 - (width/2)
@@ -58,18 +62,47 @@ class Game_over :
                 font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(0, 255, 0)) # Bouton "REJOUER"
         self.widg_menu = widget.Button((x, 2*y), size=(width, height), text="MENU", action=application.menu, 
                 font="Razer Regular", centered=True, police=26, bold=True, hoover_color=(255, 0, 0)) # Bouton "MENU"
-        self.widg_score = widget.Label((0.75*x,1.5*y), size=(2*width, height), text="Score de la partie: " + score, 
-                text_color = (200,200,200), font="Razer Regular", centered=True, police=26, bold=True, color = (0,0,0,0)) # affichage du score
+        self.widg_score = widget.Label((0.75*x,1.4*y), size=(2*width, height), text="Score de la partie: " + score, 
+                text_color = (200,200,200), font="Razer Regular", centered=True, police=26, bold=False, color = (0,0,0,0)) # affichage du score
+        self.widg_record = widget.Label((0.75*x,1.6*y), size=(2*width, height), text="Meilleur score: " + record_score, 
+                text_color = (200,200,200), font="Razer Regular", centered=True, police=26, bold=False, color = (0,0,0,0)) # affichage du score
 
         fond = config.getImage("fond game over") # recuperation de l'image du fond menu
         fond = pygame.transform.scale(fond, taille_ecran) # redimension de l'image
         pygame.display.get_surface().blit(fond, (0, 0)) # on colle le fond
+
+    def meilleur_score(self, score):
+        ''' Renvoit et remplace le nouveau record si besoin'''
+
+        ''' Si le fichier existe ... sinon on le crée'''
+        try:
+            with open("../save.txt", "r+") as fichier:
+                ''' On lit le contenu de la save '''
+                json_dic = fichier.read()
+                dic = json.loads(json_dic)       
+
+                ''' Si on a un nouveau record, on le sauvegarde '''
+                if dic["record"] < score:
+                    dic["record"] = score
+                    json_dic = json.dumps(dic)
+                    fichier.write(json_dic)
+
+            return str(dic["record"]) # on renvoit le meilleur score
+
+        except FileNotFoundError:
+            with open("../save.txt", "w") as fichier:
+                json_dic = json.dumps({"record": score})
+                fichier.write(json_dic) # on stocke le meilleur score
+
+            return str(score)
+
 
     def detruire(self) :
         ''' Efface le game over en supprimant tout les widget '''
         self.widg_rejouer.kill()
         self.widg_menu.kill()
         self.widg_score.kill()
+        self.widg_record.kill()
 				
 class Jeu:
     ''' S'occupe de gérer le jeu principale (la fenêtre du moins) '''
