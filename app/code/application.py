@@ -24,7 +24,13 @@ taille_ecran = dic_config["taille_ecran"] #Dimension de la fenêtre / Largeurcon
 
 class Menu :
     """ Création et gestion des boutons du menu """
-    def __init__(self, application) : 
+    def __init__(self, application) :
+
+        ''' Destruction préventive des widget precedant (comme les notif) '''
+        for  widg in widget.Widget.group:
+            widg.kill()
+			
+        record_score = self.meilleur_score_menu()
         width = 200
         height = 50
         x = taille_ecran[0]/2 - (width/2)
@@ -33,15 +39,32 @@ class Menu :
                 font="Razer Regular", centered=True, police=24, bold=True, hoover_color=(0, 255, 0)) # Bouton "JOUER"
         self.widg_quitter = widget.Button((x, 2*y), size=(width, height), text="QUITTER", action=application.quitter,
                 font="Razer Regular", centered=True, police=24, bold=True, hoover_color=(255, 0, 0)) # Bouton "QUITTER"
+        self.widg_record = widget.Label((x,1.5*y), size=(width, height), text="Meilleur score: " + record_score,
+                text_color=(255,255,255), font="Razer Regular", centered=True, police=26, bold=True, color = (255,255,255,0)) # affichage du score
 
         fond = config.getImage("fond menu") # recuperation de l'image du fond menu
         fond = pygame.transform.scale(fond, taille_ecran) #redimension de l'image
         pygame.display.get_surface().blit(fond, (0, 0)) # on colle le fond
+		
+    def meilleur_score_menu(self):
+        ''' Renvoit et remplace le nouveau record si besoin'''
+
+        ''' Si le fichier existe ... sinon on le crée'''
+        try:
+            with open("../save.txt", "r") as fichier:
+                ''' On lit le contenu de la save '''
+                json_dic = fichier.read()
+                dic = json.loads(json_dic)       
+            return str(dic["record"]) # on renvoit le meilleur score
+
+        except FileNotFoundError:
+            return "0"
 
     def detruire(self) :
         ''' Efface le menu en détruisant les boutons '''
         self.widg_jouer.kill()
-        self.widg_quitter.kill() 
+        self.widg_quitter.kill()
+        self.widg_record.kill()
  
 class Game_over :
     """ Création et gestion des boutons du game over """

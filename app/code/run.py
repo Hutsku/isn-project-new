@@ -19,7 +19,7 @@ config_dic = config.getConfig() # Recupère les paramètres de base
 taille = config_dic["taille_ecran"] # Definie la taille de l'ecran
 
 fenetre = pygame.display.set_mode(taille) # Création de la fenêtre
-pygame.display.set_caption("Le Donjon sans fin") # Change le nom de la fenêtre
+pygame.display.set_caption("Under the infinite dungeon") # Change le nom de la fenêtre
 
 config.init() # initialisation du module de configuration (pour les images)
 

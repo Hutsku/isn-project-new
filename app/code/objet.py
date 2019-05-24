@@ -126,7 +126,7 @@ class Personnage(Character):
 		dim = dimension[1] #recupere la dimension du personnage 
 		dim = int(dim) #transforme la dimension en nombre entier
 		self.dimension = (dim, dim) # recree la dimension du personnage sous forme (x,y)
-		self.speed = 3 #vitesse du personnage
+		self.speed = config.getConfig()["vitesse"] #vitesse du personnage
 		
 		self.image_b = config.getImage("personnage b") #image du personnage
 		self.image_b = pygame.transform.scale(self.image_b, self.dimension) #redimensionne l'image du personnage

@@ -23,10 +23,17 @@ class Dongeon ():
 		self.lien_dossier = "../niveau/" #lien vers le fichier de sauvegarde
 		self.nombre_lvl = -1 #nombre de niveau traversé (-1 important!)
 		self.niveau = None # aucun niveau par défaut
+		self.liste_lvl = [] # Liste des niveaux
+		self.liste_niveau() # créé une liste
 		self.change_level() # Choisi un niveau aléatoirement
-			
+
 		self.timer = config.getConfig()["temps"] #recupere le temps d'une partie
 
+
+	def liste_niveau(self) : #permet de lister tous les niveau
+		(path, dirs, filenames) = next(os.walk(self.lien_dossier)) #liste tout les niveaux present
+		self.liste_lvl = filenames #enregistre la liste
+		
 	def change_timer(self, temps):
 		'''fonction pour modifier le temps'''
 		self.timer += temps #modifie le temps
@@ -144,19 +151,24 @@ class Dongeon ():
 		if lien_niveau: # Si un niveau est passé en paramètre, on met celui-ci ... (debug)
 			self.niveau = Niveau(lien_niveau)
 
-		else: # ... sinon c'est automatique
-			(path, dirs, filenames) = next(os.walk(self.lien_dossier)) # liste tout les niveaux présent ...
+		
+		else: # ... sinon c'est automatique			
 			
 			if self.niveau: # si il y a déjà un niveau avant ...
 				niveau_actuel = self.niveau.lien_lvl.split("/")[-1] # on recupère le nom du level et on l'arrange
-				filenames.remove(niveau_actuel) # on enlève de la liste le niveau actuel (pour eviter de le jouer 2 fois de suite)
+				self.liste_lvl.remove(niveau_actuel) # on enlève de la liste le niveau actuel (pour eviter de le jouer 2 fois de suite)
+				
+			if not self.liste_lvl: #si la liste de niveau est vide
+				self.liste_niveau() #creation d'une liste
+			
 
-			fichier = random.choice(filenames) #on choisit au hasard
+			fichier = random.choice(self.liste_lvl) #on choisit au hasard
 			self.niveau = Niveau(self.lien_dossier+fichier)	#on créer le niveau.		
 				
 		self.effacer() # Puis on efface le précedant ...
 		self.build() # ... et on construit le nouveau.
 		self.nombre_lvl += 1 #ajout d'un niveau au score
+		print(str(fichier))
 		
 class Niveau ():
 	'''permet la sauvegarde de differents parametre niveau'''

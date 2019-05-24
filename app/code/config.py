@@ -14,7 +14,8 @@ taille_HUD = round((20*taille_level)/100) #definie la taille de l'hud largeur		(
 taille_editeur = taille_level + 300 #definie taille editeur 						(auto)
 taille_case = round(taille_level/nb_case) #definie la taille d'une case 			(auto)
 taille_ecran = (taille_level+taille_HUD, taille_level) #definie taille de l'ecrant 	(auto)
-taille_personnage = 0.8*taille_case #definie taille personnage 						(default 0.8*taille_case)
+taille_personnage = 0.75*taille_case #definie taille personnage 					(defaut 0.75*taille_case)
+vitesse_personnage = 3 #vitesse du personnage en jeu								(defaut 3)
 temps_de_base = 30 #temps d'une partie (en secondes)								(defaut 30)
 degat_des_pics = 5 #temps malus (en seconde) pour les degats des pics				(defaut 5)
 degat_lave = 10 #temps malus (en seconde) pour les degats de la lave				(defaut 10)
@@ -87,6 +88,7 @@ def getConfig():
 			"taille_level":taille_level,
 			"taille_editeur": taille_editeur,
 			"temps": temps_de_base,
+			"vitesse": vitesse_personnage,
 			"degat_pics": degat_des_pics,
 			"degat_lave": degat_lave,
 			"bonus": bonus_de_temps,
